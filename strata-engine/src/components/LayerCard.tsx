@@ -44,8 +44,11 @@ export function LayerCard({ gs, i, onUpgrade, onUnlock }: Props) {
   const progress = Math.min(1, layer.elapsed / layer.int);
   const remaining = Math.max(0, layer.int - layer.elapsed);
   const upgradeMul = Math.pow(layer.upgrades + 1, 0.2);
-  const effectiveGain = layer.gain * (1 + layer.gainBonus) * layer.tierMul * gs.resonanceMul * gm;
-  const effectiveBp = layer.bp * upgradeMul * layer.tierMul;
+  const expo = gs.spu.deep * 0.01 + 1.03;
+  const tierExp = Math.pow(expo, layer.pct);
+  const bonusVal = Math.pow(1 + layer.gainBonus, tierExp);
+  const effectiveGain = layer.gain * bonusVal * gs.resonanceMul * gm;
+  const effectiveBp = layer.bp * upgradeMul;
   const canUpgrade = gs.res >= layer.cost;
   const nextTierAt = tierThreshold(layer.pct + 1);
   const tierProgress = Math.min(1, layer.upgrades / nextTierAt);
