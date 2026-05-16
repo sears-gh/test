@@ -30,6 +30,12 @@ export function resonance(prev: GameState): GameState {
   next.lastPrestigeGtime = prev.lastPrestigeGtime;
   next.memoryActive = prev.memoryActive;
   next.memoryCleared = prev.memoryCleared;
+
+  // Compress bonus: floor(resonanceMul) free levels
+  const freeCompress = Math.floor(newMul);
+  next.compressLevel = freeCompress;
+  next.compressCost  = Math.pow(10, freeCompress);
+
   return next;
 }
 
@@ -71,12 +77,14 @@ export function manualPrestige(prev: GameState): GameState {
 
 export function upgrade(prev: GameState, i: number): GameState {
   const layer = prev.layers[i];
-  if (!layer.unlocked || prev.res < layer.cost) return prev;
+  const resMul = Math.max(1, prev.resonanceMul);
+  const effectiveCost = layer.cost / resMul;
+  if (!layer.unlocked || prev.res < effectiveCost) return prev;
 
   const layers = prev.layers.map(l => ({ ...l }));
   const l = layers[i];
 
-  const res = prev.res - l.cost;
+  const res = prev.res - effectiveCost;
   l.cost *= LCFG[i].uM;
   l.int *= 0.8;
   l.upgrades += 1;
@@ -94,13 +102,15 @@ export function upgrade(prev: GameState, i: number): GameState {
 
 export function unlock(prev: GameState, i: number): GameState {
   const layer = prev.layers[i];
-  if (layer.unlocked || prev.res < LCFG[i].uc) return prev;
+  const resMul = Math.max(1, prev.resonanceMul);
+  const effectiveUc = LCFG[i].uc / resMul;
+  if (layer.unlocked || prev.res < effectiveUc) return prev;
 
   const layers = prev.layers.map(l => ({ ...l }));
   layers[i].unlocked = true;
   layers[i].firstFire = true;
 
-  return { ...prev, res: prev.res - LCFG[i].uc, layers };
+  return { ...prev, res: prev.res - effectiveUc, layers };
 }
 
 export function unlockConLayer(prev: GameState, i: number): GameState {
@@ -117,10 +127,12 @@ export function unlockConLayer(prev: GameState, i: number): GameState {
 }
 
 export function buyCompress(prev: GameState): GameState {
-  if (prev.res < prev.compressCost) return prev;
+  const resMul = Math.max(1, prev.resonanceMul);
+  const effectiveCost = prev.compressCost / resMul;
+  if (prev.res < effectiveCost) return prev;
   return {
     ...prev,
-    res: prev.res - prev.compressCost,
+    res: prev.res - effectiveCost,
     compressLevel: prev.compressLevel + 1,
     compressCost: prev.compressCost * 10,
   };

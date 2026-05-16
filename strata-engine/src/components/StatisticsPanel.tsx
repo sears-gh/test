@@ -36,6 +36,10 @@ export function StatisticsPanel({ gs, onClose }: Props) {
     boostPerSec: number;
   };
 
+  const gmExp      = 1 + gs.resonanceMul * 0.01;
+  const effectiveGm = Math.pow(gm, gmExp);
+  const resMul      = Math.max(1, gs.resonanceMul);
+
   const layerStats: LayerStat[] = gs.layers.map((l, i) => {
     const fireRate      = l.unlocked ? (0.5 / (l.int * Math.pow(0.95, gs.compressLevel))) : 0;
     const tierExpFull   = Math.pow(1.05, l.pct);
@@ -46,7 +50,7 @@ export function StatisticsPanel({ gs, onClose }: Props) {
     const upgMulA       = Math.pow(l.upgrades + 1, 0.2);
     const upgMulB       = 1 + 0.1 * l.pct;
     const upgradeMul    = upgMulA * upgMulB;
-    const gainPerFire   = l.gain * bonusForGain * gm * ceMul;
+    const gainPerFire   = l.gain * bonusForGain * effectiveGm * ceMul;
     const resPerSec     = fireRate * gainPerFire;
     const boostPerFire  = l.bp * upgradeMul * bonusForBoost;
     const boostPerSec   = fireRate * boostPerFire;
@@ -108,7 +112,7 @@ export function StatisticsPanel({ gs, onClose }: Props) {
                       <Td style={{ color: LCFG[i].c }}>{LCFG[i].n}</Td>
                       <Td right dim>{fmtN(l.gain)}</Td>
                       <Td right dim>×{fmtN(ls.bonusForGain)}</Td>
-                      <Td right dim>×{gm.toFixed(3)}</Td>
+                      <Td right dim>×{effectiveGm.toFixed(3)}</Td>
                       <Td right dim>×{ceMul.toFixed(3)}</Td>
                       <Td right>{fmtN(ls.gainPerFire)}</Td>
                       <Td right>{fmtN(ls.resPerSec)}</Td>
@@ -123,11 +127,17 @@ export function StatisticsPanel({ gs, onClose }: Props) {
 
         {/* ── グローバル倍率 ── */}
         <Section label="グローバル倍率">
-          <Row label="合計 gm" val={`×${gm.toFixed(4)}`} accent />
+          <Row label="合計 gm (raw)" val={`×${gm.toFixed(4)}`} />
           <Row label="  gmBase (SP gMul)" val={`×${gs.gmBase.toFixed(4)}`} />
           <Row label="  gmBonus (Quark蓄積)" val={`+${fmtN(gs.gmBonus)}`} />
           {gs.layers[0].unlocked && (
             <Row label="  Quark gm増加率" val={`+${fmtN(layerStats[0].boostPerSec)}/s`} />
+          )}
+          {gs.resonanceMul > 1 && (
+            <>
+              <Row label="  gm指数 (◈×resMul×0.01)" val={`^${gmExp.toFixed(4)}`} />
+              <Row label="  effectiveGm = gm^指数" val={`×${fmtN(effectiveGm)}`} accent />
+            </>
           )}
         </Section>
 
@@ -248,6 +258,9 @@ export function StatisticsPanel({ gs, onClose }: Props) {
           <Section label="レゾナンス">
             <Row label="resonanceMul" val={`×${gs.resonanceMul.toFixed(6)}`} accent />
             <Row label="指数" val={`1/${resExpDenom}  (Resonance Tuning Lv.${gs.spu.resExp})`} />
+            <Row label="◈ effectiveGm" val={`gm^${gmExp.toFixed(4)} = ×${fmtN(effectiveGm)}`} accent />
+            <Row label="◈ コスト削減" val={`÷${gs.resonanceMul.toFixed(4)}  (upgrade/unlock/compress)`} />
+            <Row label="◈ Compress加算" val={`+${Math.floor(gs.resonanceMul)} Lv (Resonance時リセット→付与)`} />
             <Row label="回数" val={`${gs.resonanceCnt}回`} />
             <Row label="現在の積 Π(1+gainBonus)" val={fmtN(gs.layers.reduce((a, l) => a * (1 + l.gainBonus), 1))} />
             <Row label="前回の積" val={fmtN(gs.prevResonanceProduct)} />
@@ -348,7 +361,10 @@ export function StatisticsPanel({ gs, onClose }: Props) {
         <Section label="Compress (SC購入)">
           <Row label="レベル" val={`Lv.${gs.compressLevel}`} />
           <Row label="インターバル倍率" val={`×${Math.pow(0.95, gs.compressLevel).toFixed(4)}`} accent />
-          <Row label="次のコスト" val={`${fmtN(gs.compressCost)} SC`} />
+          <Row label="次のコスト (raw)" val={`${fmtN(gs.compressCost)} SC`} />
+          {resMul > 1 && (
+            <Row label="次のコスト (÷resMul)" val={`${fmtN(gs.compressCost / resMul)} SC`} accent />
+          )}
         </Section>
 
         {/* ── プレスティージ ── */}

@@ -15,15 +15,19 @@ export function LayerCard({ gs, i, onUpgrade, onUnlock }: Props) {
   const cfg = LCFG[i];
   const gm = gs.gmBase + gs.gmBonus;
 
+  const resMul = Math.max(1, gs.resonanceMul);
+
   if (!layer.unlocked) {
-    const canUnlock = gs.res >= cfg.uc;
+    const effectiveUc = cfg.uc / resMul;
+    const canUnlock = gs.res >= effectiveUc;
     return (
       <div style={{ ...styles.card, borderColor: cfg.c + "44" }}>
         <div style={{ ...styles.lockedName, color: cfg.c + "88" }}>
           🔒 {cfg.n}
         </div>
         <div style={styles.lockedCost}>
-          Unlock: <span style={{ color: "#00ffcc" }}>{fmtN(cfg.uc)} SC</span>
+          Unlock: <span style={{ color: "#00ffcc" }}>{fmtN(effectiveUc)} SC</span>
+          {resMul > 1 && <span style={{ color: "#666688" }}> (÷{resMul.toFixed(2)})</span>}
         </div>
         <button
           style={{
@@ -54,9 +58,12 @@ export function LayerCard({ gs, i, onUpgrade, onUnlock }: Props) {
   const bonusForBoost = Math.pow(baseVal, tierExpFull * linearBoostExp);
   const ceExp = 0.1 + gs.spu.ceEff * 0.05;
   const ceMul = gs.ce > 0 ? Math.pow(1 + gs.ce, ceExp) : 1;
-  const effectiveGain = layer.gain * bonusForGain * gm * ceMul;
+  const gmExp = 1 + gs.resonanceMul * 0.01;
+  const effectiveGm = Math.pow(gm, gmExp);
+  const effectiveGain = layer.gain * bonusForGain * effectiveGm * ceMul;
   const effectiveBp = layer.bp * upgradeMul * bonusForBoost;
-  const canUpgrade = gs.res >= layer.cost;
+  const effectiveUpgCost = layer.cost / resMul;
+  const canUpgrade = gs.res >= effectiveUpgCost;
   const nextTierAt = tierThreshold(layer.pct + 1);
   const tierProgress = Math.min(1, layer.upgrades / nextTierAt);
 
@@ -149,7 +156,7 @@ export function LayerCard({ gs, i, onUpgrade, onUnlock }: Props) {
           onClick={onUpgrade}
           disabled={!canUpgrade}
         >
-          UPGRADE <span style={{ color: canUpgrade ? "#00ffcc" : "#444" }}>{fmtN(layer.cost)} SC</span>
+          UPGRADE <span style={{ color: canUpgrade ? "#00ffcc" : "#444" }}>{fmtN(effectiveUpgCost)} SC</span>
         </button>
       </div>
     </div>

@@ -10,7 +10,9 @@ interface Props {
 export function CompressCard({ gs, onBuy }: Props) {
   const { compressLevel: lv, compressCost: cost } = gs;
   const mul = Math.pow(0.95, lv);
-  const canBuy = gs.res >= cost;
+  const resMul = Math.max(1, gs.resonanceMul);
+  const effectiveCost = cost / resMul;
+  const canBuy = gs.res >= effectiveCost;
 
   return (
     <div style={styles.card}>
@@ -29,7 +31,7 @@ export function CompressCard({ gs, onBuy }: Props) {
         onClick={onBuy}
         disabled={!canBuy}
       >
-        {fmtN(cost)} SC
+        {fmtN(effectiveCost)} SC
       </button>
     </div>
   );

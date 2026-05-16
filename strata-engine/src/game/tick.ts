@@ -39,6 +39,8 @@ export function tick(prev: GameState, dt: number): GameState {
       ticks++;
 
       const currentGm = prev.gmBase + gmBonus;
+      const gmExp = 1 + prev.resonanceMul * 0.01;
+      const effectiveGm = Math.pow(currentGm, gmExp);
       const tierExpFull   = Math.pow(1.05, layer.pct);
       const linearBoostExp = 0.200 + tierStep * layer.pct;
       const upgradeMul = Math.pow(layer.upgrades + 1, 0.2) * (1 + 0.1 * layer.pct);
@@ -57,7 +59,7 @@ export function tick(prev: GameState, dt: number): GameState {
 
       if (isGain) {
         // ── Gain event ──
-        const gained = layer.gain * bonusForGain * currentGm * ceMul;
+        const gained = layer.gain * bonusForGain * effectiveGm * ceMul;
         res += gained;
         layer.evt = "gain";
         layer.evtAmt = gained;
@@ -91,7 +93,7 @@ export function tick(prev: GameState, dt: number): GameState {
 
         // Secondary: trigger gain at 1/10 strength
         if (secStrength > 0) {
-          res += layer.gain * bonusForGain * currentGm * ceMul * secStrength;
+          res += layer.gain * bonusForGain * effectiveGm * ceMul * secStrength;
         }
       }
 

@@ -22,6 +22,8 @@ export function Header({
 }: Props) {
   const hasSP = gs.sp > 0 || gs.pcnt > 0;
   const gm = gs.gmBase + gs.gmBonus;
+  const gmExp = 1 + gs.resonanceMul * 0.01;
+  const effectiveGm = Math.pow(gm, gmExp);
   const cosmosUnlocked = gs.layers[7]?.unlocked ?? false;
   const resonanceReady = canResonate(gs);
   const ceExp = 0.1 + gs.spu.ceEff * 0.05;
@@ -39,7 +41,10 @@ export function Header({
     <div style={styles.sideStats}>
       <StatLine label="gm内訳" val={`base ${gs.gmBase.toFixed(2)} + acc ${fmtN(gs.gmBonus)}`} />
       {gs.resonanceMul > 1 && (
-        <StatLine label="resonance" val={`◈×${gs.resonanceMul.toFixed(4)}`} />
+        <>
+          <StatLine label="resonance" val={`◈×${gs.resonanceMul.toFixed(4)}`} />
+          <StatLine label="effectiveGm" val={`×${fmtN(effectiveGm)} (^${gmExp.toFixed(3)})`} />
+        </>
       )}
       {ceMul > 1.001 && (
         <StatLine label="CE倍率" val={`✦×${ceMul.toFixed(4)}`} />
@@ -69,7 +74,10 @@ export function Header({
       {/* gm row — compact on top-bar mode */}
       <div style={styles.gmRow}>
         <span style={styles.gmText}>
-          Global ×{gm.toFixed(3)}
+          Global ×{gs.resonanceMul > 1 ? effectiveGm.toFixed(3) : gm.toFixed(3)}
+          {gs.resonanceMul > 1 && (
+            <span style={{ color: "#888888", fontSize: 9 }}> (^{gmExp.toFixed(3)})</span>
+          )}
           {!sidebar && gs.resonanceMul > 1 && (
             <span style={styles.resMulBadge}> ◈×{gs.resonanceMul.toFixed(4)}</span>
           )}
