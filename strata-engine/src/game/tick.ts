@@ -22,7 +22,7 @@ export function tick(prev: GameState, dt: number): GameState {
   const ceMul = ce > 0 ? Math.pow(1 + ce, ceExp) : 1;
   const tierStep = getTierStep(prev.spu.deep);
   const secStrength = prev.spu.halfTrigger > 0 ? 0.1 : 0;
-  const compressMul = Math.pow(0.995, prev.compressLevel);
+  const compressMul = Math.pow(0.95, prev.compressLevel);
 
   for (let i = 0; i < layersMut.length; i++) {
     const layer = layersMut[i];

@@ -9,7 +9,7 @@ interface Props {
 
 export function CompressCard({ gs, onBuy }: Props) {
   const { compressLevel: lv, compressCost: cost } = gs;
-  const mul = Math.pow(0.995, lv);
+  const mul = Math.pow(0.95, lv);
   const canBuy = gs.res >= cost;
 
   return (

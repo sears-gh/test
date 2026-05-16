@@ -37,7 +37,7 @@ export function StatisticsPanel({ gs, onClose }: Props) {
   };
 
   const layerStats: LayerStat[] = gs.layers.map((l, i) => {
-    const fireRate      = l.unlocked ? (0.5 / (l.int * Math.pow(0.995, gs.compressLevel))) : 0;
+    const fireRate      = l.unlocked ? (0.5 / (l.int * Math.pow(0.95, gs.compressLevel))) : 0;
     const tierExpFull   = Math.pow(1.05, l.pct);
     const linearBoostExp = 0.200 + tierStep * l.pct;
     const baseVal       = (1 + l.gainBonus) * gs.resonanceMul;
@@ -347,7 +347,7 @@ export function StatisticsPanel({ gs, onClose }: Props) {
         {/* ── Compress ── */}
         <Section label="Compress (SC購入)">
           <Row label="レベル" val={`Lv.${gs.compressLevel}`} />
-          <Row label="インターバル倍率" val={`×${Math.pow(0.995, gs.compressLevel).toFixed(4)}`} accent />
+          <Row label="インターバル倍率" val={`×${Math.pow(0.95, gs.compressLevel).toFixed(4)}`} accent />
           <Row label="次のコスト" val={`${fmtN(gs.compressCost)} SC`} />
         </Section>
 
