@@ -72,14 +72,14 @@ export function StatisticsPanel({ gs, onClose }: Props) {
         </div>
 
         {/* ── Section 1: res/s ── */}
-        <Section label="リソース獲得速度">
-          <Row label="合計 (期待値)" val={`${fmtN(totalResPerSec)}/s`} accent />
+        <Section label="SC 獲得速度 (Strata Component/s)">
+          <Row label="合計 (期待値)" val={`${fmtN(totalResPerSec)} SC/s`} accent />
           <div style={s.tableWrap}>
             <table style={s.table}>
               <thead>
                 <tr>
                   <Th>層</Th>
-                  <Th right>/s</Th>
+                  <Th right>SC/s</Th>
                   <Th right>×Bonus</Th>
                   <Th right>×gm</Th>
                   <Th right>×CE</Th>
@@ -254,6 +254,12 @@ export function StatisticsPanel({ gs, onClose }: Props) {
         )}
 
         {/* ── Section 6: prestige / memory ── */}
+        <Section label="Compress (SC購入)">
+          <Row label="レベル" val={`Lv.${gs.compressLevel}`} />
+          <Row label="インターバル倍率" val={`×${Math.pow(0.995, gs.compressLevel).toFixed(4)}`} accent />
+          <Row label="次のコスト" val={`${fmtN(gs.compressCost)} SC`} />
+        </Section>
+
         <Section label="プレスティージ">
           <Row label="星列崩壊回数" val={`${gs.pcnt}回`} />
           <Row label="現在ゲーム時間" val={fmtT(gs.gtime)} />

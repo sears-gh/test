@@ -19,7 +19,7 @@ export function loadSave(): GameState | null {
     const newSpuFields: (keyof typeof defaultSpu)[] = [
       "halfTrigger", "resResidual",
       "ul2", "ul3", "ul4", "ul5", "ul6", "ul7", "ul8",
-      "ceEff", "compress",
+      "ceEff",
     ];
     for (const k of newSpuFields) {
       if (spu[k] === undefined) spu[k] = 0;
@@ -33,6 +33,8 @@ export function loadSave(): GameState | null {
     gs.memoryActive = gs.memoryActive ?? false;
     gs.memoryCleared = gs.memoryCleared ?? false;
     gs.maxResonanceMul = gs.maxResonanceMul ?? (gs.resonanceMul ?? 1);
+    gs.compressLevel = gs.compressLevel ?? 0;
+    gs.compressCost  = gs.compressCost  ?? 1;
 
     if (!gs.conLayers || gs.conLayers.length !== NUM_LAYERS) {
       gs.conLayers = Array.from({ length: NUM_LAYERS }, (_, i) => mkConLayer(i));

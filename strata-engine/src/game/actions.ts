@@ -30,6 +30,9 @@ export function resonance(prev: GameState): GameState {
   next.lastPrestigeGtime = prev.lastPrestigeGtime;
   next.memoryActive = prev.memoryActive;
   next.memoryCleared = prev.memoryCleared;
+  // Compress は SC 消費なのでレゾナンス時にはリセットしない
+  next.compressLevel = prev.compressLevel;
+  next.compressCost = prev.compressCost;
   return next;
 }
 
@@ -111,6 +114,16 @@ export function unlockConLayer(prev: GameState, i: number): GameState {
   if (i === 0) cc += 1;
 
   return { ...prev, sp: prev.sp - CON_LCFG[i].sp, conLayers, cc };
+}
+
+export function buyCompress(prev: GameState): GameState {
+  if (prev.res < prev.compressCost) return prev;
+  return {
+    ...prev,
+    res: prev.res - prev.compressCost,
+    compressLevel: prev.compressLevel + 1,
+    compressCost: prev.compressCost * 10,
+  };
 }
 
 export function buySP(prev: GameState, k: keyof SpUpgrades): GameState {

@@ -4,7 +4,7 @@ import { mkGs, defaultSpu } from "./game/init";
 import { loadSave, useSave } from "./hooks/useSave";
 import { useGameLoop } from "./hooks/useGameLoop";
 import { useWindowWidth } from "./hooks/useWindowWidth";
-import { upgrade, unlock, buySP, resonance, unlockConLayer, manualPrestige } from "./game/actions";
+import { upgrade, unlock, buySP, resonance, unlockConLayer, manualPrestige, buyCompress } from "./game/actions";
 import { Header } from "./components/Header";
 import { LayerCard } from "./components/LayerCard";
 import { SpShop } from "./components/SpShop";
@@ -12,6 +12,7 @@ import { HelpPanel } from "./components/HelpPanel";
 import { PrestigeFlash } from "./components/PrestigeFlash";
 import { ResonanceModal } from "./components/ResonanceModal";
 import { ConstellationPanel } from "./components/ConstellationPanel";
+import { CompressCard } from "./components/CompressCard";
 import { StatisticsPanel } from "./components/StatisticsPanel";
 import { NUM_LAYERS } from "./game/config";
 
@@ -46,11 +47,15 @@ function App() {
   const sidebarWidth = isMedium ? (isWide ? 300 : 280) : 0;
 
   const layers = (
+    <div>
+    <div style={{ padding: isMedium ? "12px 14px 0" : "12px 12px 0" }}>
+      <CompressCard gs={gs} onBuy={() => setGs(prev => buyCompress(prev))} />
+    </div>
     <div style={{
       display: "grid",
       gridTemplateColumns: layerCols,
       gap: 8,
-      padding: isMedium ? "12px 14px 32px" : "12px 12px 32px",
+      padding: isMedium ? "4px 14px 32px" : "4px 12px 32px",
       alignItems: "start",
     }}>
       {Array.from({ length: NUM_LAYERS }, (_, i) => (
@@ -62,6 +67,7 @@ function App() {
           onUnlock={() => setGs(prev => unlock(prev, i))}
         />
       ))}
+    </div>
     </div>
   );
 

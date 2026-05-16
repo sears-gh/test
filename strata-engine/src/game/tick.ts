@@ -22,6 +22,7 @@ export function tick(prev: GameState, dt: number): GameState {
   const ceMul = ce > 0 ? Math.pow(1 + ce, ceExp) : 1;
   const tierExpBase = getTierExp(prev.spu.deep);
   const secStrength = prev.spu.halfTrigger > 0 ? 0.1 : 0;
+  const compressMul = Math.pow(0.995, prev.compressLevel);
 
   for (let i = 0; i < layersMut.length; i++) {
     const layer = layersMut[i];
@@ -30,10 +31,11 @@ export function tick(prev: GameState, dt: number): GameState {
     if (!layer.unlocked) continue;
 
     layer.elapsed += dt;
+    const effectiveInt = layer.int * compressMul;
 
     let ticks = 0;
-    while (layer.elapsed >= layer.int && ticks < 20) {
-      layer.elapsed -= layer.int;
+    while (layer.elapsed >= effectiveInt && ticks < 20) {
+      layer.elapsed -= effectiveInt;
       ticks++;
 
       const currentGm = prev.gmBase + gmBonus;
@@ -85,7 +87,7 @@ export function tick(prev: GameState, dt: number): GameState {
       layer.flash = 0.65;
     }
 
-    if (layer.elapsed >= layer.int) layer.elapsed = 0;
+    if (layer.elapsed >= effectiveInt) layer.elapsed = 0;
   }
 
   // Constellation ticks

@@ -28,17 +28,16 @@ export interface SpUpgrades {
   boost:       number;
   gain:        number;
   deep:        number;
-  halfTrigger: number; // 発火時に外れた効果も1/10で発動
-  resResidual: number; // 歴代最大resonanceMulの10%を初期適用
-  ul2:         number; // Atom 初期解放
-  ul3:         number; // Cell 初期解放
-  ul4:         number; // Organism 初期解放
-  ul5:         number; // Planet 初期解放
-  ul6:         number; // Star 初期解放
-  ul7:         number; // Galaxy 初期解放
-  ul8:         number; // Cosmos 初期解放
-  ceEff:       number; // CE効率強化 (無制限)
-  compress:    number; // 全星列インターバル ×0.995/レベル (コスト ×10 逓増)
+  halfTrigger: number;
+  resResidual: number;
+  ul2:         number;
+  ul3:         number;
+  ul4:         number;
+  ul5:         number;
+  ul6:         number;
+  ul7:         number;
+  ul8:         number;
+  ceEff:       number;
 }
 
 export interface GameState {
@@ -52,7 +51,7 @@ export interface GameState {
   resonanceMul:         number;
   prevResonanceProduct: number;
   resonanceCnt:         number;
-  maxResonanceMul:      number; // 歴代最大のresonanceMul (resResidual用)
+  maxResonanceMul:      number;
   cc:                   number;
   ce:                   number;
   conLayers:            ConstellationLayer[];
@@ -60,4 +59,6 @@ export interface GameState {
   lastPrestigeGtime:    number;
   memoryActive:         boolean;
   memoryCleared:        boolean;
+  compressLevel:        number; // SC購入のInterval圧縮レベル
+  compressCost:         number; // 次のCompress購入コスト
 }

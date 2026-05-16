@@ -23,7 +23,7 @@ export function LayerCard({ gs, i, onUpgrade, onUnlock }: Props) {
           🔒 {cfg.n}
         </div>
         <div style={styles.lockedCost}>
-          Unlock: <span style={{ color: "#00ffcc" }}>{fmtN(cfg.uc)}</span>
+          Unlock: <span style={{ color: "#00ffcc" }}>{fmtN(cfg.uc)} SC</span>
         </div>
         <button
           style={{
@@ -41,8 +41,10 @@ export function LayerCard({ gs, i, onUpgrade, onUnlock }: Props) {
     );
   }
 
-  const progress = Math.min(1, layer.elapsed / layer.int);
-  const remaining = Math.max(0, layer.int - layer.elapsed);
+  const compressMul = Math.pow(0.995, gs.compressLevel);
+  const effectiveInt = layer.int * compressMul;
+  const progress = Math.min(1, layer.elapsed / effectiveInt);
+  const remaining = Math.max(0, effectiveInt - layer.elapsed);
   const upgradeMul = Math.pow(layer.upgrades + 1, 0.2);
   const tierExpBase = getTierExp(gs.spu.deep);
   const tierExp = Math.pow(tierExpBase, layer.pct);
@@ -121,7 +123,7 @@ export function LayerCard({ gs, i, onUpgrade, onUnlock }: Props) {
         </div>
         <div style={styles.stat}>
           <span style={styles.statLabel}>Interval</span>
-          <span style={styles.statVal}>{fmtT(layer.int)}</span>
+          <span style={styles.statVal}>{fmtT(effectiveInt)}</span>
         </div>
       </div>
 
@@ -144,7 +146,7 @@ export function LayerCard({ gs, i, onUpgrade, onUnlock }: Props) {
           onClick={onUpgrade}
           disabled={!canUpgrade}
         >
-          UPGRADE <span style={{ color: canUpgrade ? "#00ffcc" : "#444" }}>{fmtN(layer.cost)}</span>
+          UPGRADE <span style={{ color: canUpgrade ? "#00ffcc" : "#444" }}>{fmtN(layer.cost)} SC</span>
         </button>
       </div>
     </div>

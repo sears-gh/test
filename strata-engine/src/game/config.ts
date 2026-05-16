@@ -66,8 +66,7 @@ export const SP_DEF: SpDef[] = [
   { k: "ul8", name: "Cosmos 解放",   info: "周回開始時 Cosmos を解放済みにする",   cost: 150, max: 1, group: "unlock" },
 
   // ── 星座機構 ──
-  { k: "ceEff",    name: "CE効率強化",       info: "CE倍率の指数 +0.05 (コスト毎回 ×1000)",                     cost: 1e6, max: -1, costMul: 1000, group: "con"  },
-  { k: "compress", name: "Interval Compression", info: "全星列階層のインターバル ×0.995/レベル (コスト毎回 ×10)", cost: 1, max: -1, costMul: 10,   group: "core" },
+  { k: "ceEff", name: "CE効率強化", info: "CE倍率の指数 +0.05 (コスト毎回 ×1000)", cost: 1e6, max: -1, costMul: 1000, group: "con" },
 ];
 
 export interface ConLayerCfg {

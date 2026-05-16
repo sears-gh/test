@@ -62,7 +62,7 @@ export function Header({
     <div style={sidebar ? styles.sidebarWrap : styles.headerWrap}>
       {/* Resource */}
       <div style={styles.resRow}>
-        <span style={styles.resLabel}>RESOURCES</span>
+        <span style={styles.resLabel}>STRATA COMPONENT (SC)</span>
         <span style={{ ...styles.resVal, fontSize: sidebar ? 22 : 28 }}>{fmtN(gs.res)}</span>
       </div>
 
