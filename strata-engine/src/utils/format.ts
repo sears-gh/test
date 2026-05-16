@@ -1,25 +1,15 @@
 import { GP_THRESHOLD } from "../game/config";
 
-const SUFFIXES = ["K","M","B","T","Qa","Qi","Sx","Sp","Oc","Nd","Dc"];
-
 export function fmtN(n: number): string {
   if (n <= 0) return "0";
   if (!isFinite(n) || n >= GP_THRESHOLD) return "∞";
 
-  if (n < 1000) {
-    if (n < 10) return n.toFixed(2);
-    return Math.floor(n).toString();
-  }
-
-  for (let i = SUFFIXES.length - 1; i >= 0; i--) {
-    const val = Math.pow(1000, i + 1);
-    if (n >= val) {
-      return (n / val).toFixed(3).slice(0, 4).replace(/\.?0+$/, "") + SUFFIXES[i];
-    }
-  }
-
-  // fallback for very large numbers
-  return n.toExponential(3);
+  const exp = Math.floor(Math.log10(n));
+  const mantissa = n / Math.pow(10, exp);
+  const expStr = exp >= 0
+    ? `e+${String(exp).padStart(3, "0")}`
+    : `e-${String(-exp).padStart(3, "0")}`;
+  return `${mantissa.toFixed(2)}${expStr}`;
 }
 
 // SP 専用フォーマット: 整数表示 + 大きい数は suffix
