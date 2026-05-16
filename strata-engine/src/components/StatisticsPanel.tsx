@@ -38,7 +38,7 @@ export function StatisticsPanel({ gs, onClose }: Props) {
 
   const layerStats: LayerStat[] = gs.layers.map((l, i) => {
     const fireRate      = l.unlocked ? (0.5 / (l.int * Math.pow(0.995, gs.compressLevel))) : 0;
-    const tierExpFull   = Math.pow(1.01, l.pct);
+    const tierExpFull   = Math.pow(1.05, l.pct);
     const linearBoostExp = 0.200 + tierStep * l.pct;
     const baseVal       = (1 + l.gainBonus) * gs.resonanceMul;
     const bonusForGain  = Math.pow(baseVal, tierExpFull);
@@ -133,7 +133,7 @@ export function StatisticsPanel({ gs, onClose }: Props) {
 
         {/* ── Bonus チェーン ── */}
         <Section label="Bonus チェーン  (gain用)">
-          <Note>Bonus = ((1+gainBonus) × resMul)^(1.01^Tier)</Note>
+          <Note>Bonus = ((1+gainBonus) × resMul)^(1.05^Tier)</Note>
           <div style={s.tableWrap}>
             <table style={s.table}>
               <thead>
@@ -142,7 +142,7 @@ export function StatisticsPanel({ gs, onClose }: Props) {
                   <Th right>gainBonus</Th>
                   <Th right>×resMul</Th>
                   <Th right>baseVal</Th>
-                  <Th right>^(1.01^T)</Th>
+                  <Th right>^(1.05^T)</Th>
                   <Th right>Bonus</Th>
                 </tr>
               </thead>
