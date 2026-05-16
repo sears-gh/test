@@ -19,7 +19,7 @@ export function loadSave(): GameState | null {
     const newSpuFields: (keyof typeof defaultSpu)[] = [
       "halfTrigger", "resResidual",
       "ul2", "ul3", "ul4", "ul5", "ul6", "ul7", "ul8",
-      "ceEff",
+      "ceEff", "compress",
     ];
     for (const k of newSpuFields) {
       if (spu[k] === undefined) spu[k] = 0;

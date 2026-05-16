@@ -38,6 +38,7 @@ export interface SpUpgrades {
   ul7:         number; // Galaxy 初期解放
   ul8:         number; // Cosmos 初期解放
   ceEff:       number; // CE効率強化 (無制限)
+  compress:    number; // 全星列インターバル ×0.995/レベル (コスト ×10 逓増)
 }
 
 export interface GameState {
