@@ -29,12 +29,11 @@ export function tick(prev: GameState, dt: number): GameState {
       const currentGm = prev.gmBase + gmBonus;
 
       const upgradeMul = Math.pow(layer.upgrades + 1, 0.2);
-      const expo = prev.spu.deep * 0.01 + 1.03;
-      const tierExp = Math.pow(expo, layer.pct);
-      const bonusVal = Math.pow(1 + layer.gainBonus, tierExp);
+      const tierExp = Math.pow(1.01, layer.pct);
+      const bonusVal = Math.pow((1 + layer.gainBonus) * prev.resonanceMul, tierExp);
 
       if (Math.random() < 0.5) {
-        const gained = layer.gain * bonusVal * prev.resonanceMul * currentGm;
+        const gained = layer.gain * bonusVal * currentGm;
         res += gained;
         layer.evt = "gain";
         layer.evtAmt = gained;
