@@ -39,11 +39,11 @@ export function StatisticsPanel({ gs, onClose }: Props) {
   const gmExp        = 1 + gs.resonanceMul * 0.01;
   const effectiveGm  = Math.pow(gm, gmExp);
   const resMul       = Math.max(1, gs.resonanceMul);
-  const resBonus     = Math.floor(gs.resonanceMul);
-  const effectiveLv  = gs.compressLevel + resBonus;
+  const resonatorExp = Math.pow(1.02, gs.resonators);
+  const compressMul  = Math.pow(0.95, gs.compressLevel * resonatorExp);
 
   const layerStats: LayerStat[] = gs.layers.map((l, i) => {
-    const fireRate      = l.unlocked ? (0.5 / (l.int * Math.pow(0.95, effectiveLv))) : 0;
+    const fireRate      = l.unlocked ? (0.5 / (l.int * compressMul)) : 0;
     const tierExpFull   = Math.pow(1.05, l.pct);
     const linearBoostExp = 0.200 + tierStep * l.pct;
     const baseVal       = (1 + l.gainBonus) * gs.resonanceMul;
@@ -262,8 +262,9 @@ export function StatisticsPanel({ gs, onClose }: Props) {
             <Row label="指数" val={`1/${resExpDenom}  (Resonance Tuning Lv.${gs.spu.resExp})`} />
             <Row label="◈ effectiveGm" val={`gm^${gmExp.toFixed(4)} = ×${fmtN(effectiveGm)}`} accent />
             <Row label="◈ コスト削減" val={`÷${gs.resonanceMul.toFixed(4)}  (upgrade/unlock/compress)`} />
-            <Row label="◈ Compress加算" val={`+${Math.floor(gs.resonanceMul)} Lv (Resonance時リセット→付与)`} />
             <Row label="回数" val={`${gs.resonanceCnt}回`} />
+            <Row label="累積SC (周回内)" val={fmtN(gs.totalSCGained)} />
+            <Row label="共振子 (Resonator)" val={`${gs.resonators}個  (Compress効果 ^${resonatorExp.toFixed(4)})`} accent />
             {(() => {
               const rawGm = gs.gmBase + gs.gmBonus;
               const product = gs.layers.reduce((acc, l) => {
@@ -381,12 +382,9 @@ export function StatisticsPanel({ gs, onClose }: Props) {
 
         {/* ── Compress ── */}
         <Section label="Compress (SC購入)">
-          <Row label="購入レベル" val={`Lv.${gs.compressLevel}`} />
-          {resBonus > 0 && (
-            <Row label="◈ Resonance加算" val={`+${resBonus}  (floor(×${gs.resonanceMul.toFixed(3)}))`} accent />
-          )}
-          <Row label="合計レベル" val={`Lv.${effectiveLv}`} />
-          <Row label="インターバル倍率" val={`×${Math.pow(0.95, effectiveLv).toFixed(4)}`} accent />
+          <Row label="レベル" val={`Lv.${gs.compressLevel}`} />
+          <Row label="共振子指数" val={`1.02^${gs.resonators} = ${resonatorExp.toFixed(4)}`} />
+          <Row label="インターバル倍率" val={`0.95^(Lv×${resonatorExp.toFixed(4)}) = ×${compressMul.toFixed(6)}`} accent />
           <Row label="次のコスト" val={`${fmtN(gs.compressCost / resMul)} SC${resMul > 1 ? ` (÷${resMul.toFixed(2)})` : ""}`} />
         </Section>
 

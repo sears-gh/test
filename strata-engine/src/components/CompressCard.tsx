@@ -9,14 +9,13 @@ interface Props {
 
 export function CompressCard({ gs, onBuy }: Props) {
   const { compressLevel: lv, compressCost: cost } = gs;
-  const resBonus = Math.floor(gs.resonanceMul);
-  const effectiveLv = lv + resBonus;
-  const mul = Math.pow(0.95, effectiveLv);
+  const resonatorExp = Math.pow(1.02, gs.resonators);
+  const mul = Math.pow(0.95, lv * resonatorExp);
   const resMul = Math.max(1, gs.resonanceMul);
   const effectiveCost = cost / resMul;
   const canBuy = gs.res >= effectiveCost;
 
-  const lvLabel = resBonus > 0 ? `Lv.${lv}+${resBonus}` : `Lv.${lv}`;
+  const lvLabel = `Lv.${lv}`;
 
   return (
     <div style={styles.card}>
