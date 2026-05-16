@@ -3,18 +3,20 @@ import type { GameState, SpUpgrades } from "./game/types";
 import { mkGs, defaultSpu } from "./game/init";
 import { loadSave, useSave } from "./hooks/useSave";
 import { useGameLoop } from "./hooks/useGameLoop";
-import { upgrade, unlock, buySP } from "./game/actions";
+import { upgrade, unlock, buySP, resonance } from "./game/actions";
 import { Header } from "./components/Header";
 import { LayerCard } from "./components/LayerCard";
 import { SpShop } from "./components/SpShop";
 import { HelpPanel } from "./components/HelpPanel";
 import { PrestigeFlash } from "./components/PrestigeFlash";
+import { ResonanceModal } from "./components/ResonanceModal";
 import { NUM_LAYERS } from "./game/config";
 
 function App() {
   const [gs, setGs] = useState<GameState>(() => loadSave() ?? mkGs(0, defaultSpu));
   const [showSP, setShowSP] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const [showResonance, setShowResonance] = useState(false);
 
   useGameLoop(setGs);
   const { deleteSave } = useSave(gs, setGs);
@@ -27,6 +29,7 @@ function App() {
         gs={gs}
         onOpenSP={() => setShowSP(true)}
         onOpenHelp={() => setShowHelp(true)}
+        onOpenResonance={() => setShowResonance(true)}
       />
       <div style={styles.layers}>
         {Array.from({ length: NUM_LAYERS }, (_, i) => (
@@ -50,6 +53,13 @@ function App() {
         <HelpPanel
           onClose={() => setShowHelp(false)}
           onDeleteSave={deleteSave}
+        />
+      )}
+      {showResonance && (
+        <ResonanceModal
+          gs={gs}
+          onConfirm={() => { setGs(prev => resonance(prev)); setShowResonance(false); }}
+          onCancel={() => setShowResonance(false)}
         />
       )}
       <PrestigeFlash pcnt={gs.pcnt} />

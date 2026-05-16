@@ -23,11 +23,14 @@ export interface SpUpgrades {
 }
 
 export interface GameState {
-  res:     number;
-  sp:      number;
-  spu:     SpUpgrades;
-  gmBase:  number;
-  gmBonus: number;
-  layers:  LayerState[];
-  pcnt:    number;
+  res:                  number;
+  sp:                   number;
+  spu:                  SpUpgrades;
+  gmBase:               number;
+  gmBonus:              number;
+  layers:               LayerState[];
+  pcnt:                 number;
+  resonanceMul:         number;
+  prevResonanceProduct: number;
+  resonanceCnt:         number;
 }

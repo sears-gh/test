@@ -2,16 +2,20 @@ import React from "react";
 import type { GameState } from "../game/types";
 import { GP_THRESHOLD } from "../game/config";
 import { fmtN } from "../utils/format";
+import { canResonate } from "../game/actions";
 
 interface Props {
   gs: GameState;
   onOpenSP: () => void;
   onOpenHelp: () => void;
+  onOpenResonance: () => void;
 }
 
-export function Header({ gs, onOpenSP, onOpenHelp }: Props) {
+export function Header({ gs, onOpenSP, onOpenHelp, onOpenResonance }: Props) {
   const hasSP = gs.sp > 0 || gs.pcnt > 0;
   const gm = gs.gmBase + gs.gmBonus;
+  const cosmosUnlocked = gs.layers[7]?.unlocked ?? false;
+  const resonanceReady = canResonate(gs);
 
   const logRes = gs.res > 0 ? Math.log10(Math.min(gs.res, GP_THRESHOLD)) : 0;
   const logMax = Math.log10(GP_THRESHOLD);
@@ -24,7 +28,12 @@ export function Header({ gs, onOpenSP, onOpenHelp }: Props) {
         <span style={styles.resVal}>{fmtN(gs.res)}</span>
       </div>
       <div style={styles.gmRow}>
-        <span style={styles.gmText}>Global ×{gm.toFixed(3)}</span>
+        <span style={styles.gmText}>
+          Global ×{gm.toFixed(3)}
+          {gs.resonanceMul > 1 && (
+            <span style={styles.resMulBadge}> ◈×{gs.resonanceMul.toFixed(4)}</span>
+          )}
+        </span>
         {hasSP && (
           <span style={styles.spText}>SP: <span style={styles.spVal}>{gs.sp}</span></span>
         )}
@@ -36,6 +45,20 @@ export function Header({ gs, onOpenSP, onOpenHelp }: Props) {
         <span style={styles.barLabel}>Prestige {gpPct.toFixed(1)}%</span>
       </div>
       <div style={styles.btnRow}>
+        {cosmosUnlocked && (
+          <button
+            style={{
+              ...styles.resonanceBtn,
+              borderColor: resonanceReady ? "#00ffcc" : "#1a5555",
+              color: resonanceReady ? "#00ffcc" : "#336666",
+              boxShadow: resonanceReady ? "0 0 8px #00ffcc44" : "none",
+            }}
+            onClick={onOpenResonance}
+          >
+            ◈ RESONANCE
+            {gs.resonanceCnt > 0 && <span style={styles.resCnt}> ({gs.resonanceCnt})</span>}
+          </button>
+        )}
         {hasSP && (
           <button style={styles.spBtn} onClick={onOpenSP}>
             ★ SP SHOP
@@ -85,6 +108,10 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 12,
     fontFamily: "'Courier New', monospace",
   },
+  resMulBadge: {
+    color: "#00ffcc",
+    fontWeight: "bold",
+  },
   spText: {
     color: "#aaaadd",
     fontSize: 12,
@@ -126,6 +153,21 @@ const styles: Record<string, React.CSSProperties> = {
     gap: 8,
     marginTop: 8,
     justifyContent: "flex-end",
+  },
+  resonanceBtn: {
+    background: "linear-gradient(135deg, #001a1a, #002a2a)",
+    border: "1px solid",
+    borderRadius: 4,
+    padding: "4px 10px",
+    cursor: "pointer",
+    fontSize: 12,
+    fontFamily: "'Courier New', monospace",
+    letterSpacing: 1,
+    transition: "border-color 0.3s, color 0.3s, box-shadow 0.3s",
+  },
+  resCnt: {
+    fontSize: 10,
+    opacity: 0.7,
   },
   spBtn: {
     background: "linear-gradient(135deg, #1a1a3e, #2a2a5e)",

@@ -33,5 +33,8 @@ export function mkGs(sp: number, spu: SpUpgrades): GameState {
     gmBonus: 0,
     layers: Array.from({ length: NUM_LAYERS }, (_, i) => mkLayer(i, spu)),
     pcnt: 0,
+    resonanceMul: 1,
+    prevResonanceProduct: 0,
+    resonanceCnt: 0,
   };
 }

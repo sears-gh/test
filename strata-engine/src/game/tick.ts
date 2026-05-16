@@ -31,7 +31,7 @@ export function tick(prev: GameState, dt: number): GameState {
       const upgradeMul = Math.pow(layer.upgrades + 1, 0.2);
 
       if (Math.random() < 0.5) {
-        const gained = layer.gain * (1 + layer.gainBonus) * currentGm;
+        const gained = layer.gain * (1 + layer.gainBonus) * prev.resonanceMul * currentGm;
         res += gained;
         layer.evt = "gain";
         layer.evtAmt = gained;
