@@ -12,6 +12,7 @@ export interface LayerState {
   evt:       string;
   evtAmt:    number;
   unlocked:  boolean;
+  firstFire: boolean; // 解禁後の最初の発火は必ずSCを出す
 }
 
 export interface ConstellationLayer {
