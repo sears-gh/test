@@ -1,4 +1,4 @@
-import { LCFG, CON_LCFG, SP_DEF, tierThreshold } from "./config";
+import { LCFG, CON_LCFG, SP_DEF, getSpNextCost, tierThreshold } from "./config";
 import type { GameState, SpUpgrades } from "./types";
 import { mkGs, mkConLayer } from "./init";
 
@@ -15,12 +15,14 @@ export function resonance(prev: GameState): GameState {
   if (!canResonate(prev)) return prev;
   const product = resonanceProduct(prev);
   const newMul = Math.pow(product, 1 / 16);
+  const newMaxMul = Math.max(prev.maxResonanceMul, newMul);
+
   const next = mkGs(prev.sp, prev.spu);
   next.pcnt = prev.pcnt;
   next.resonanceMul = newMul;
   next.prevResonanceProduct = product;
   next.resonanceCnt = prev.resonanceCnt + 1;
-  // Carry constellation and memory state through resonance
+  next.maxResonanceMul = newMaxMul;
   next.cc = prev.cc;
   next.ce = prev.ce;
   next.conLayers = prev.conLayers.map(cl => ({ ...cl }));
@@ -39,14 +41,20 @@ export function doPrestige(prev: GameState): GameState {
   const spGain = prev.memoryCleared
     ? Math.max(1, Math.floor(Math.log10(Math.max(prev.res, 10)) / 308))
     : 1;
+
   const next = mkGs(prev.sp + spGain, prev.spu);
   next.pcnt = prev.pcnt + 1;
   next.gtime = prev.gtime;
   next.lastPrestigeGtime = prev.gtime;
   next.memoryActive = willTriggerMemory;
   next.memoryCleared = memorySuccess || prev.memoryCleared;
+  next.maxResonanceMul = prev.maxResonanceMul;
 
-  // Con layers stay unlocked but reset intervals and efficiency
+  // Apply resonance residual: start with 10% of historical max
+  if (prev.spu.resResidual > 0 && prev.maxResonanceMul > 1) {
+    next.resonanceMul = 1 + (prev.maxResonanceMul - 1) * 0.1;
+  }
+
   next.conLayers = prev.conLayers.map((cl, i) => ({
     ...mkConLayer(i),
     unlocked: cl.unlocked,
@@ -100,7 +108,7 @@ export function unlockConLayer(prev: GameState, i: number): GameState {
   conLayers[i].unlocked = true;
 
   let cc = prev.cc;
-  if (i === 0) cc += 1; // First con layer immediately grants 1 CC
+  if (i === 0) cc += 1;
 
   return { ...prev, sp: prev.sp - CON_LCFG[i].sp, conLayers, cc };
 }
@@ -110,13 +118,13 @@ export function buySP(prev: GameState, k: keyof SpUpgrades): GameState {
   if (!spDef) return prev;
 
   const currentLevel = prev.spu[k];
-  if (prev.sp < spDef.cost || currentLevel >= spDef.max) return prev;
+  const isMaxed = spDef.max !== -1 && currentLevel >= spDef.max;
+  const cost = getSpNextCost(spDef, currentLevel);
+  if (isMaxed || prev.sp < cost) return prev;
 
   const spu = { ...prev.spu, [k]: currentLevel + 1 };
   let gmBase = prev.gmBase;
-  if (k === "gMul") {
-    gmBase = 1 + spu.gMul * 0.25;
-  }
+  if (k === "gMul") gmBase = 1 + spu.gMul * 0.25;
 
-  return { ...prev, sp: prev.sp - spDef.cost, spu, gmBase };
+  return { ...prev, sp: prev.sp - cost, spu, gmBase };
 }

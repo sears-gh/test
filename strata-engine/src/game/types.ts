@@ -19,15 +19,25 @@ export interface ConstellationLayer {
   int:        number;
   bi:         number;
   elapsed:    number;
-  efficiency: number; // starts at 1.0 (100%), increases by 0.05 per reset cycle
+  efficiency: number;
 }
 
 export interface SpUpgrades {
-  gMul:  number;
-  speed: number;
-  boost: number;
-  gain:  number;
-  deep:  number;
+  gMul:        number;
+  speed:       number;
+  boost:       number;
+  gain:        number;
+  deep:        number;
+  halfTrigger: number; // 発火時に外れた効果も1/10で発動
+  resResidual: number; // 歴代最大resonanceMulの10%を初期適用
+  ul2:         number; // Atom 初期解放
+  ul3:         number; // Cell 初期解放
+  ul4:         number; // Organism 初期解放
+  ul5:         number; // Planet 初期解放
+  ul6:         number; // Star 初期解放
+  ul7:         number; // Galaxy 初期解放
+  ul8:         number; // Cosmos 初期解放
+  ceEff:       number; // CE効率強化 (無制限)
 }
 
 export interface GameState {
@@ -41,13 +51,12 @@ export interface GameState {
   resonanceMul:         number;
   prevResonanceProduct: number;
   resonanceCnt:         number;
-  // Constellation system
-  cc:                   number;  // Cosmic Cores
-  ce:                   number;  // Cosmic Energy (accumulated at cc/s)
+  maxResonanceMul:      number; // 歴代最大のresonanceMul (resResidual用)
+  cc:                   number;
+  ce:                   number;
   conLayers:            ConstellationLayer[];
-  // Memory event tracking
-  gtime:                number;  // total game time in seconds
+  gtime:                number;
   lastPrestigeGtime:    number;
-  memoryActive:         boolean; // 星列の記憶 in progress
-  memoryCleared:        boolean; // 星列の記憶 succeeded; new prestige rules apply
+  memoryActive:         boolean;
+  memoryCleared:        boolean;
 }

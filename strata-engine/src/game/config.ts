@@ -35,32 +35,53 @@ export interface SpDef {
   k: string;
   name: string;
   info: string;
-  cost: number;
-  max: number;
+  cost: number;  // 初回コスト (ceEff は毎回 ×1000)
+  max: number;   // -1 = 無制限
+  group: string;
+}
+
+export function getSpNextCost(def: SpDef, currentLevel: number): number {
+  if (def.max === -1) return def.cost * Math.pow(1000, currentLevel);
+  return def.cost;
 }
 
 export const SP_DEF: SpDef[] = [
-  { k: "gMul",  name: "Cosmic Resonance",  info: "+0.25 グローバル倍率/レベル",       cost: 1, max: 10 },
-  { k: "speed", name: "Temporal Warp",     info: "全階層の基本インターバル −10%/レベル", cost: 2, max: 8  },
-  { k: "boost", name: "Cascade Amplifier", info: "全ブースト加算値 +10%/レベル",        cost: 2, max: 10 },
-  { k: "gain",  name: "Primal Harvest",    info: "基本リソース獲得量 +30%/レベル",      cost: 1, max: 10 },
-  { k: "deep",  name: "Deep Resonance",    info: "階層プレスティージ指数 1.01→1.04",   cost: 5, max: 1  },
+  // ── コア強化 ──
+  { k: "gMul",        name: "Cosmic Resonance",  info: "+0.25 グローバル倍率/レベル",                   cost: 1,  max: 10, group: "core"    },
+  { k: "speed",       name: "Temporal Warp",      info: "全階層の基本インターバル −10%/レベル",            cost: 2,  max: 8,  group: "core"    },
+  { k: "boost",       name: "Cascade Amplifier",  info: "全ブースト加算値 +10%/レベル",                  cost: 2,  max: 10, group: "core"    },
+  { k: "gain",        name: "Primal Harvest",     info: "基本リソース獲得量 +30%/レベル",                 cost: 1,  max: 10, group: "core"    },
+  { k: "deep",        name: "Deep Resonance",     info: "階層プレスティージ指数 1.01→1.04",              cost: 5,  max: 1,  group: "core"    },
+  { k: "halfTrigger", name: "Dual Cascade",       info: "発火時、外れた効果も1/10で発動 (全層適用)",       cost: 5,  max: 1,  group: "core"    },
+  { k: "resResidual", name: "Resonance Residual", info: "周回開始時、歴代最大 resonanceMul の10%を初期適用", cost: 15, max: 1,  group: "core"    },
+
+  // ── 初期解放 ──
+  { k: "ul2", name: "Atom 解放",     info: "周回開始時 Atom を解放済みにする",     cost: 3,   max: 1, group: "unlock" },
+  { k: "ul3", name: "Cell 解放",     info: "周回開始時 Cell を解放済みにする",     cost: 6,   max: 1, group: "unlock" },
+  { k: "ul4", name: "Organism 解放", info: "周回開始時 Organism を解放済みにする", cost: 10,  max: 1, group: "unlock" },
+  { k: "ul5", name: "Planet 解放",   info: "周回開始時 Planet を解放済みにする",   cost: 20,  max: 1, group: "unlock" },
+  { k: "ul6", name: "Star 解放",     info: "周回開始時 Star を解放済みにする",     cost: 40,  max: 1, group: "unlock" },
+  { k: "ul7", name: "Galaxy 解放",   info: "周回開始時 Galaxy を解放済みにする",   cost: 80,  max: 1, group: "unlock" },
+  { k: "ul8", name: "Cosmos 解放",   info: "周回開始時 Cosmos を解放済みにする",   cost: 150, max: 1, group: "unlock" },
+
+  // ── 星座機構 ──
+  { k: "ceEff", name: "CE効率強化", info: "CE倍率の指数 +0.05 (コスト毎回 ×1000)", cost: 3, max: -1, group: "con" },
 ];
 
 export interface ConLayerCfg {
   n:  string;
   c:  string;
-  t:  number; // base interval (seconds)
-  sp: number; // SP cost to unlock
+  t:  number;
+  sp: number;
 }
 
 export const CON_LCFG: ConLayerCfg[] = [
-  { n: "Nebula",      c: "#e17055", t: 3,    sp: 1  },
-  { n: "Pulsar",      c: "#74b9ff", t: 8,    sp: 2  },
-  { n: "Quasar",      c: "#a29bfe", t: 20,   sp: 3  },
-  { n: "Void",        c: "#fd79a8", t: 50,   sp: 5  },
-  { n: "Singularity", c: "#00b894", t: 120,  sp: 8  },
-  { n: "Membrane",    c: "#fdcb6e", t: 300,  sp: 13 },
-  { n: "Manifold",    c: "#55efc4", t: 750,  sp: 21 },
-  { n: "Vertex",      c: "#b2bec3", t: 1800, sp: 34 },
+  { n: "Nebula",      c: "#e17055", t: 3,    sp: 100   },
+  { n: "Pulsar",      c: "#74b9ff", t: 8,    sp: 250   },
+  { n: "Quasar",      c: "#a29bfe", t: 20,   sp: 600   },
+  { n: "Void",        c: "#fd79a8", t: 50,   sp: 1500  },
+  { n: "Singularity", c: "#00b894", t: 120,  sp: 3500  },
+  { n: "Membrane",    c: "#fdcb6e", t: 300,  sp: 8000  },
+  { n: "Manifold",    c: "#55efc4", t: 750,  sp: 20000 },
+  { n: "Vertex",      c: "#b2bec3", t: 1800, sp: 50000 },
 ];

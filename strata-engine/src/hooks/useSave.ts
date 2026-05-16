@@ -11,24 +11,32 @@ export function loadSave(): GameState | null {
     if (!raw) return null;
     const gs = JSON.parse(raw) as GameState;
 
-    // Recompute bp from config to fix stale values
     const bm = 1 + gs.spu.boost * 0.1;
     gs.layers.forEach((l, i) => { l.bp = LCFG[i].b * bm; });
 
-    // Migrate new fields added after initial release
+    // Migrate new SpUpgrades fields
+    const spu = gs.spu as unknown as Record<string, number>;
+    const newSpuFields: (keyof typeof defaultSpu)[] = [
+      "halfTrigger", "resResidual",
+      "ul2", "ul3", "ul4", "ul5", "ul6", "ul7", "ul8",
+      "ceEff",
+    ];
+    for (const k of newSpuFields) {
+      if (spu[k] === undefined) spu[k] = 0;
+    }
+
+    // Migrate new GameState fields
     gs.cc = gs.cc ?? 0;
     gs.ce = gs.ce ?? 0;
     gs.gtime = gs.gtime ?? 0;
     gs.lastPrestigeGtime = gs.lastPrestigeGtime ?? 0;
     gs.memoryActive = gs.memoryActive ?? false;
     gs.memoryCleared = gs.memoryCleared ?? false;
+    gs.maxResonanceMul = gs.maxResonanceMul ?? (gs.resonanceMul ?? 1);
 
     if (!gs.conLayers || gs.conLayers.length !== NUM_LAYERS) {
       gs.conLayers = Array.from({ length: NUM_LAYERS }, (_, i) => mkConLayer(i));
     }
-
-    // Ensure spu has deep field (older saves may not)
-    if (gs.spu.deep === undefined) gs.spu.deep = 0;
 
     return gs;
   } catch {

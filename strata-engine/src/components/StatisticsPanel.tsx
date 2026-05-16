@@ -15,7 +15,8 @@ function pct(val: number, total: number): string {
 
 export function StatisticsPanel({ gs, onClose }: Props) {
   const gm = gs.gmBase + gs.gmBonus;
-  const ceMul = gs.ce > 0 ? Math.pow(1 + gs.ce, 0.1) : 1;
+  const ceExp = 0.1 + gs.spu.ceEff * 0.05;
+  const ceMul = gs.ce > 0 ? Math.pow(1 + gs.ce, ceExp) : 1;
   const tierExpBase = getTierExp(gs.spu.deep);
 
   // ── Per-layer derived stats ──────────────────────────────
@@ -159,6 +160,24 @@ export function StatisticsPanel({ gs, onClose }: Props) {
             </div>
           )}
         </Section>
+
+        {/* ── Section 3b: SP effects ── */}
+        {(gs.spu.halfTrigger > 0 || gs.spu.resResidual > 0 || gs.spu.ceEff > 0) && (
+          <Section label="SP効果 (アクティブ)">
+            {gs.spu.halfTrigger > 0 && (
+              <Row label="Dual Cascade" val="外れ効果 ×0.1 発動中" accent />
+            )}
+            {gs.spu.resResidual > 0 && (
+              <Row
+                label="Resonance Residual"
+                val={`初期 ×${(1 + (gs.maxResonanceMul - 1) * 0.1).toFixed(4)} (歴代最大: ×${gs.maxResonanceMul.toFixed(4)})`}
+              />
+            )}
+            {gs.spu.ceEff > 0 && (
+              <Row label="CE効率強化" val={`Lv.${gs.spu.ceEff}  指数 ^${ceExp.toFixed(2)}`} />
+            )}
+          </Section>
+        )}
 
         {/* ── Section 4: resonance ── */}
         {gs.resonanceCnt > 0 || gs.resonanceMul > 1 ? (

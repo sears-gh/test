@@ -24,7 +24,8 @@ export function Header({
   const gm = gs.gmBase + gs.gmBonus;
   const cosmosUnlocked = gs.layers[7]?.unlocked ?? false;
   const resonanceReady = canResonate(gs);
-  const ceMul = gs.ce > 0 ? Math.pow(1 + gs.ce, 0.1) : 1;
+  const ceExp = 0.1 + gs.spu.ceEff * 0.05;
+  const ceMul = gs.ce > 0 ? Math.pow(1 + gs.ce, ceExp) : 1;
 
   const logRes = gs.res > 0 ? Math.log10(Math.min(gs.res, GP_THRESHOLD)) : 0;
   const logMax = Math.log10(GP_THRESHOLD);
