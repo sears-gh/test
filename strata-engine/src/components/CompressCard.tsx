@@ -9,16 +9,20 @@ interface Props {
 
 export function CompressCard({ gs, onBuy }: Props) {
   const { compressLevel: lv, compressCost: cost } = gs;
-  const mul = Math.pow(0.95, lv);
+  const resBonus = Math.floor(gs.resonanceMul);
+  const effectiveLv = lv + resBonus;
+  const mul = Math.pow(0.95, effectiveLv);
   const resMul = Math.max(1, gs.resonanceMul);
   const effectiveCost = cost / resMul;
   const canBuy = gs.res >= effectiveCost;
+
+  const lvLabel = resBonus > 0 ? `Lv.${lv}+${resBonus}` : `Lv.${lv}`;
 
   return (
     <div style={styles.card}>
       <div style={styles.left}>
         <span style={styles.name}>COMPRESS</span>
-        <span style={styles.level}>Lv.{lv}</span>
+        <span style={styles.level}>{lvLabel}</span>
         <span style={styles.effect}>全インターバル ×{mul.toFixed(4)}</span>
       </div>
       <button

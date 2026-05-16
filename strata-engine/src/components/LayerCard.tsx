@@ -45,7 +45,7 @@ export function LayerCard({ gs, i, onUpgrade, onUnlock }: Props) {
     );
   }
 
-  const compressMul = Math.pow(0.95, gs.compressLevel);
+  const compressMul = Math.pow(0.95, gs.compressLevel + Math.floor(gs.resonanceMul));
   const effectiveInt = layer.int * compressMul;
   const progress = Math.min(1, layer.elapsed / effectiveInt);
   const remaining = Math.max(0, effectiveInt - layer.elapsed);

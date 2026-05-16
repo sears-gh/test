@@ -31,11 +31,6 @@ export function resonance(prev: GameState): GameState {
   next.memoryActive = prev.memoryActive;
   next.memoryCleared = prev.memoryCleared;
 
-  // Compress bonus: floor(resonanceMul) free levels, cost unchanged
-  const freeCompress = Math.floor(newMul);
-  next.compressLevel = freeCompress;
-  next.compressCost  = 1;
-
   return next;
 }
 
