@@ -8,9 +8,10 @@ interface Props {
   i: number;
   onUpgrade: () => void;
   onUnlock: () => void;
+  onBulkUpgrade: () => void;
 }
 
-export function LayerCard({ gs, i, onUpgrade, onUnlock }: Props) {
+export function LayerCard({ gs, i, onUpgrade, onUnlock, onBulkUpgrade }: Props) {
   const layer = gs.layers[i];
   const cfg = LCFG[i];
   const gm = gs.gmBase + gs.gmBonus;
@@ -158,6 +159,21 @@ export function LayerCard({ gs, i, onUpgrade, onUnlock }: Props) {
         >
           UPGRADE <span style={{ color: canUpgrade ? "#00ffcc" : "#444" }}>{fmtN(effectiveUpgCost)} SC</span>
         </button>
+        {gs.pcnt >= 1 && (
+          <button
+            style={{
+              ...styles.btn,
+              borderColor: canUpgrade ? cfg.c + "99" : "#333",
+              color: canUpgrade ? cfg.c + "99" : "#555",
+              cursor: canUpgrade ? "pointer" : "not-allowed",
+              padding: "4px 7px",
+            }}
+            onClick={onBulkUpgrade}
+            disabled={!canUpgrade}
+          >
+            ×10
+          </button>
+        )}
       </div>
     </div>
   );

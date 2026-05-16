@@ -65,4 +65,5 @@ export interface GameState {
   compressCost:         number;
   totalSCGained:        number; // 周回内累積SC（レゾナンスをまたいで保持）
   resonators:           number; // 共振子（レゾナンス時に加算、周回リセット）
+  autoUnlock:           boolean; // 自動アンロック（pcnt≥3で解放）
 }

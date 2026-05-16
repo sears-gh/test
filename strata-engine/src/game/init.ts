@@ -67,5 +67,6 @@ export function mkGs(sp: number, spu: SpUpgrades): GameState {
     compressCost:  1,
     totalSCGained: 0,
     resonators:    0,
+    autoUnlock:    false,
   };
 }

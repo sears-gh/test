@@ -37,6 +37,7 @@ export function loadSave(): GameState | null {
     gs.compressCost   = gs.compressCost   ?? 1;
     gs.totalSCGained  = gs.totalSCGained  ?? 0;
     gs.resonators     = gs.resonators     ?? 0;
+    gs.autoUnlock     = gs.autoUnlock     ?? false;
     gs.layers.forEach(l => { l.firstFire = l.firstFire ?? false; });
 
     if (!gs.conLayers || gs.conLayers.length !== NUM_LAYERS) {

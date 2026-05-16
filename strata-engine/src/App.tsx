@@ -4,7 +4,7 @@ import { mkGs, defaultSpu } from "./game/init";
 import { loadSave, useSave } from "./hooks/useSave";
 import { useGameLoop } from "./hooks/useGameLoop";
 import { useWindowWidth } from "./hooks/useWindowWidth";
-import { upgrade, unlock, buySP, resonance, unlockConLayer, manualPrestige, buyCompress } from "./game/actions";
+import { upgrade, unlock, buySP, resonance, unlockConLayer, manualPrestige, buyCompress, bulkUpgrade, bulkCompress, toggleAutoUnlock } from "./game/actions";
 import { Header } from "./components/Header";
 import { LayerCard } from "./components/LayerCard";
 import { SpShop } from "./components/SpShop";
@@ -49,7 +49,12 @@ function App() {
   const layers = (
     <div>
     <div style={{ padding: isMedium ? "12px 14px 0" : "12px 12px 0" }}>
-      <CompressCard gs={gs} onBuy={() => setGs(prev => buyCompress(prev))} />
+      <CompressCard
+        gs={gs}
+        onBuy={() => setGs(prev => buyCompress(prev))}
+        onBulkBuy={() => setGs(prev => bulkCompress(prev, 10))}
+        onToggleAutoUnlock={() => setGs(prev => toggleAutoUnlock(prev))}
+      />
     </div>
     <div style={{
       display: "grid",
@@ -65,6 +70,7 @@ function App() {
           i={i}
           onUpgrade={() => setGs(prev => upgrade(prev, i))}
           onUnlock={() => setGs(prev => unlock(prev, i))}
+          onBulkUpgrade={() => setGs(prev => bulkUpgrade(prev, i, 10))}
         />
       ))}
     </div>

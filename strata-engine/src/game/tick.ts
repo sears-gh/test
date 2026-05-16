@@ -1,4 +1,4 @@
-import { GP_THRESHOLD, getTierStep } from "./config";
+import { GP_THRESHOLD, getTierStep, LCFG } from "./config";
 import type { GameState, LayerState, ConstellationLayer } from "./types";
 import { doPrestige } from "./actions";
 
@@ -138,6 +138,22 @@ export function tick(prev: GameState, dt: number): GameState {
     }
 
     if (cl.elapsed >= cl.int) cl.elapsed = 0;
+  }
+
+  // Auto-unlock
+  if (prev.autoUnlock && prev.pcnt >= 3) {
+    const resMul = Math.max(1, prev.resonanceMul);
+    for (let i = 0; i < layersMut.length; i++) {
+      if (!layersMut[i].unlocked) {
+        const effectiveUc = LCFG[i].uc / resMul;
+        if (res >= effectiveUc) {
+          res -= effectiveUc;
+          layersMut[i].unlocked = true;
+          layersMut[i].firstFire = true;
+        }
+        break;
+      }
+    }
   }
 
   if (!prev.memoryCleared && (res >= GP_THRESHOLD || res === Infinity)) {

@@ -144,6 +144,30 @@ export function buyCompress(prev: GameState): GameState {
   };
 }
 
+export function bulkUpgrade(prev: GameState, i: number, count: number): GameState {
+  let gs = prev;
+  for (let n = 0; n < count; n++) {
+    const next = upgrade(gs, i);
+    if (next === gs) break;
+    gs = next;
+  }
+  return gs;
+}
+
+export function bulkCompress(prev: GameState, count: number): GameState {
+  let gs = prev;
+  for (let n = 0; n < count; n++) {
+    const next = buyCompress(gs);
+    if (next === gs) break;
+    gs = next;
+  }
+  return gs;
+}
+
+export function toggleAutoUnlock(prev: GameState): GameState {
+  return { ...prev, autoUnlock: !prev.autoUnlock };
+}
+
 export function buySP(prev: GameState, k: keyof SpUpgrades): GameState {
   const spDef = SP_DEF.find(d => d.k === k);
   if (!spDef) return prev;
