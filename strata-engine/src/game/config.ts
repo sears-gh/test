@@ -1,6 +1,10 @@
 export const NUM_LAYERS = 8;
-export const LP_MIN = 0.01;
 export const GP_THRESHOLD = 1.7e308;
+
+// 累積アップグレード数のTierしきい値: Tier n に到達するには 5×n×(n+1) 回
+export function tierThreshold(tier: number): number {
+  return 5 * tier * (tier + 1);
+}
 
 export interface LayerCfg {
   n: string;

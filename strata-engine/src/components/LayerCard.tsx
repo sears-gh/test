@@ -1,6 +1,6 @@
 import React from "react";
 import type { GameState } from "../game/types";
-import { LCFG } from "../game/config";
+import { LCFG, tierThreshold } from "../game/config";
 import { fmtN, fmtT } from "../utils/format";
 
 interface Props {
@@ -47,6 +47,8 @@ export function LayerCard({ gs, i, onUpgrade, onUnlock }: Props) {
   const upgradeMul = Math.pow(layer.upgrades + 1, 0.2);
   const effectiveBp = layer.bp * upgradeMul;
   const canUpgrade = gs.res >= layer.cost;
+  const nextTierAt = tierThreshold(layer.pct + 1);
+  const tierProgress = Math.min(1, layer.upgrades / nextTierAt);
 
   const flashAlpha = layer.flash > 0 ? layer.flash / 0.65 : 0;
   const glowColor = cfg.c + Math.floor(flashAlpha * 0x66).toString(16).padStart(2, "0");
@@ -116,6 +118,13 @@ export function LayerCard({ gs, i, onUpgrade, onUnlock }: Props) {
           <span style={styles.statLabel}>Interval</span>
           <span style={styles.statVal}>{fmtT(layer.int)}</span>
         </div>
+      </div>
+
+      <div style={styles.tierRow}>
+        <div style={styles.tierBarBg}>
+          <div style={{ ...styles.tierBarFill, width: `${tierProgress * 100}%`, background: cfg.c + "99" }} />
+        </div>
+        <span style={styles.tierLabel}>{layer.upgrades}/{nextTierAt} → ★{layer.pct + 1}</span>
       </div>
 
       <div style={styles.upgradeRow}>
@@ -218,6 +227,30 @@ const styles: Record<string, React.CSSProperties> = {
   },
   statVal: {
     color: "#aaaadd",
+  },
+  tierRow: {
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
+    marginBottom: 6,
+  },
+  tierBarBg: {
+    flex: 1,
+    height: 4,
+    background: "#1a1a3e",
+    borderRadius: 2,
+    overflow: "hidden",
+  },
+  tierBarFill: {
+    height: "100%",
+    borderRadius: 2,
+    transition: "width 0.1s linear",
+  },
+  tierLabel: {
+    color: "#6666aa",
+    fontSize: 10,
+    fontFamily: "'Courier New', monospace",
+    whiteSpace: "nowrap" as const,
   },
   upgradeRow: {
     display: "flex",

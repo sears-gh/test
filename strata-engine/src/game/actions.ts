@@ -1,4 +1,4 @@
-import { LCFG, LP_MIN, SP_DEF } from "./config";
+import { LCFG, SP_DEF, tierThreshold } from "./config";
 import type { GameState, SpUpgrades } from "./types";
 import { mkGs } from "./init";
 
@@ -35,7 +35,7 @@ export function upgrade(prev: GameState, i: number): GameState {
   l.int *= 0.8;
   l.upgrades += 1;
 
-  if (l.int < LP_MIN) {
+  if (l.upgrades >= tierThreshold(l.pct + 1)) {
     const expo = 1.03 + prev.spu.deep * 0.01;
     l.gain = Math.pow(l.gain, expo);
     l.bp = Math.pow(l.bp, expo);
