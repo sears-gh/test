@@ -10,10 +10,11 @@ interface Props {
   onOpenHelp: () => void;
   onOpenResonance: () => void;
   onOpenConstellation: () => void;
+  onOpenStats: () => void;
   onManualPrestige: () => void;
 }
 
-export function Header({ gs, onOpenSP, onOpenHelp, onOpenResonance, onOpenConstellation, onManualPrestige }: Props) {
+export function Header({ gs, onOpenSP, onOpenHelp, onOpenResonance, onOpenConstellation, onOpenStats, onManualPrestige }: Props) {
   const hasSP = gs.sp > 0 || gs.pcnt > 0;
   const gm = gs.gmBase + gs.gmBonus;
   const cosmosUnlocked = gs.layers[7]?.unlocked ?? false;
@@ -107,6 +108,7 @@ export function Header({ gs, onOpenSP, onOpenHelp, onOpenResonance, onOpenConste
             ★ SP SHOP
           </button>
         )}
+        <button style={styles.statsBtn} onClick={onOpenStats}>≡</button>
         <button style={styles.helpBtn} onClick={onOpenHelp}>?</button>
       </div>
     </div>
@@ -262,6 +264,16 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 12,
     fontFamily: "'Courier New', monospace",
     letterSpacing: 1,
+  },
+  statsBtn: {
+    background: "linear-gradient(135deg, #1a1a3e, #2a2a5e)",
+    border: "1px solid #4a4a8a",
+    color: "#8888cc",
+    padding: "4px 10px",
+    borderRadius: 4,
+    cursor: "pointer",
+    fontSize: 14,
+    fontFamily: "'Courier New', monospace",
   },
   helpBtn: {
     background: "linear-gradient(135deg, #1a1a3e, #2a2a5e)",

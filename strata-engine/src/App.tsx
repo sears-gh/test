@@ -11,6 +11,7 @@ import { HelpPanel } from "./components/HelpPanel";
 import { PrestigeFlash } from "./components/PrestigeFlash";
 import { ResonanceModal } from "./components/ResonanceModal";
 import { ConstellationPanel } from "./components/ConstellationPanel";
+import { StatisticsPanel } from "./components/StatisticsPanel";
 import { NUM_LAYERS } from "./game/config";
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
   const [showHelp, setShowHelp] = useState(false);
   const [showResonance, setShowResonance] = useState(false);
   const [showConstellation, setShowConstellation] = useState(false);
+  const [showStats, setShowStats] = useState(false);
 
   useGameLoop(setGs);
   const { deleteSave } = useSave(gs, setGs);
@@ -33,6 +35,7 @@ function App() {
         onOpenHelp={() => setShowHelp(true)}
         onOpenResonance={() => setShowResonance(true)}
         onOpenConstellation={() => setShowConstellation(true)}
+        onOpenStats={() => setShowStats(true)}
         onManualPrestige={() => setGs(prev => manualPrestige(prev))}
       />
       <div style={styles.layers}>
@@ -65,6 +68,9 @@ function App() {
           onConfirm={() => { setGs(prev => resonance(prev)); setShowResonance(false); }}
           onCancel={() => setShowResonance(false)}
         />
+      )}
+      {showStats && (
+        <StatisticsPanel gs={gs} onClose={() => setShowStats(false)} />
       )}
       {showConstellation && (
         <ConstellationPanel
