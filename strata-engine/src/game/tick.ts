@@ -39,7 +39,7 @@ export function tick(prev: GameState, dt: number): GameState {
       ticks++;
 
       const currentGm = prev.gmBase + gmBonus;
-      const tierExp = 0.200 + tierStep * layer.pct;
+      const tierExp = Math.pow(1.01, layer.pct) * (0.200 + tierStep * layer.pct);
       const upgradeMul = Math.pow(layer.upgrades + 1, 0.2) * (1 + 0.1 * layer.pct);
       let bonusVal = Math.pow((1 + layer.gainBonus) * prev.resonanceMul, tierExp);
       if (prev.memoryActive) bonusVal = Math.pow(bonusVal, 0.9);

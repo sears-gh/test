@@ -34,7 +34,7 @@ export function StatisticsPanel({ gs, onClose }: Props) {
   const layerStats: LayerStat[] = gs.layers.map((l, i) => {
     const fireRate = l.unlocked ? (0.5 / l.int) : 0;
     const upgradeMul = Math.pow(l.upgrades + 1, 0.2) * (1 + 0.1 * l.pct);
-    const te = 0.200 + tierStep * l.pct;
+    const te = Math.pow(1.01, l.pct) * (0.200 + tierStep * l.pct);
     const bonusVal = Math.pow((1 + l.gainBonus) * gs.resonanceMul, te);
     const gainPerFire = l.gain * bonusVal * gm * ceMul;
     const resPerSec = fireRate * gainPerFire;
