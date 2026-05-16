@@ -3,6 +3,7 @@ import type { GameState, SpUpgrades } from "./game/types";
 import { mkGs, defaultSpu } from "./game/init";
 import { loadSave, useSave } from "./hooks/useSave";
 import { useGameLoop } from "./hooks/useGameLoop";
+import { useWindowWidth } from "./hooks/useWindowWidth";
 import { upgrade, unlock, buySP, resonance, unlockConLayer, manualPrestige } from "./game/actions";
 import { Header } from "./components/Header";
 import { LayerCard } from "./components/LayerCard";
@@ -25,30 +26,47 @@ function App() {
   useGameLoop(setGs);
   const { deleteSave } = useSave(gs, setGs);
 
+  const windowWidth = useWindowWidth();
+  const isMedium = windowWidth >= 768;
+  const isWide = windowWidth >= 1280;
+
   const hasSP = gs.sp > 0 || gs.pcnt > 0;
 
-  return (
-    <div style={styles.app}>
-      <Header
-        gs={gs}
-        onOpenSP={() => setShowSP(true)}
-        onOpenHelp={() => setShowHelp(true)}
-        onOpenResonance={() => setShowResonance(true)}
-        onOpenConstellation={() => setShowConstellation(true)}
-        onOpenStats={() => setShowStats(true)}
-        onManualPrestige={() => setGs(prev => manualPrestige(prev))}
-      />
-      <div style={styles.layers}>
-        {Array.from({ length: NUM_LAYERS }, (_, i) => (
-          <LayerCard
-            key={i}
-            gs={gs}
-            i={i}
-            onUpgrade={() => setGs(prev => upgrade(prev, i))}
-            onUnlock={() => setGs(prev => unlock(prev, i))}
-          />
-        ))}
-      </div>
+  const headerProps = {
+    gs,
+    onOpenSP: () => setShowSP(true),
+    onOpenHelp: () => setShowHelp(true),
+    onOpenResonance: () => setShowResonance(true),
+    onOpenConstellation: () => setShowConstellation(true),
+    onOpenStats: () => setShowStats(true),
+    onManualPrestige: () => setGs(prev => manualPrestige(prev)),
+  };
+
+  const layerCols = isWide ? "repeat(2, 1fr)" : "1fr";
+  const sidebarWidth = isMedium ? (isWide ? 300 : 280) : 0;
+
+  const layers = (
+    <div style={{
+      display: "grid",
+      gridTemplateColumns: layerCols,
+      gap: 8,
+      padding: isMedium ? "12px 14px 32px" : "12px 12px 32px",
+      alignItems: "start",
+    }}>
+      {Array.from({ length: NUM_LAYERS }, (_, i) => (
+        <LayerCard
+          key={i}
+          gs={gs}
+          i={i}
+          onUpgrade={() => setGs(prev => upgrade(prev, i))}
+          onUnlock={() => setGs(prev => unlock(prev, i))}
+        />
+      ))}
+    </div>
+  );
+
+  const modals = (
+    <>
       {hasSP && showSP && (
         <SpShop
           gs={gs}
@@ -80,20 +98,60 @@ function App() {
         />
       )}
       <PrestigeFlash pcnt={gs.pcnt} />
+    </>
+  );
+
+  // ── Wide layout: fixed sidebar + scrollable main ─────────
+  if (isMedium) {
+    return (
+      <div style={styles.wideRoot}>
+        <aside style={{ ...styles.sidebar, width: sidebarWidth }}>
+          <Header {...headerProps} sidebar />
+        </aside>
+        <main style={styles.wideMain}>
+          {layers}
+        </main>
+        {modals}
+      </div>
+    );
+  }
+
+  // ── Narrow layout: sticky header + scrolling content ─────
+  return (
+    <div style={styles.narrowRoot}>
+      <Header {...headerProps} sidebar={false} />
+      {layers}
+      {modals}
     </div>
   );
 }
 
 const styles: Record<string, React.CSSProperties> = {
-  app: {
+  narrowRoot: {
     minHeight: "100vh",
     background: "linear-gradient(180deg, #050510 0%, #080820 100%)",
     maxWidth: 480,
     margin: "0 auto",
     color: "#ccccff",
   },
-  layers: {
-    padding: "12px 12px 32px",
+  wideRoot: {
+    display: "flex",
+    height: "100vh",
+    overflow: "hidden",
+    background: "#050510",
+    color: "#ccccff",
+  },
+  sidebar: {
+    flexShrink: 0,
+    overflowY: "auto",
+    background: "linear-gradient(180deg, #0a0a1a 0%, #0d0d2b 100%)",
+    borderRight: "1px solid #1a1a3e",
+    height: "100vh",
+  },
+  wideMain: {
+    flex: 1,
+    overflowY: "auto",
+    background: "linear-gradient(180deg, #050510 0%, #080820 100%)",
   },
 };
 
