@@ -3,13 +3,14 @@ import type { GameState, SpUpgrades } from "./game/types";
 import { mkGs, defaultSpu } from "./game/init";
 import { loadSave, useSave } from "./hooks/useSave";
 import { useGameLoop } from "./hooks/useGameLoop";
-import { upgrade, unlock, buySP, resonance } from "./game/actions";
+import { upgrade, unlock, buySP, resonance, unlockConLayer, manualPrestige } from "./game/actions";
 import { Header } from "./components/Header";
 import { LayerCard } from "./components/LayerCard";
 import { SpShop } from "./components/SpShop";
 import { HelpPanel } from "./components/HelpPanel";
 import { PrestigeFlash } from "./components/PrestigeFlash";
 import { ResonanceModal } from "./components/ResonanceModal";
+import { ConstellationPanel } from "./components/ConstellationPanel";
 import { NUM_LAYERS } from "./game/config";
 
 function App() {
@@ -17,6 +18,7 @@ function App() {
   const [showSP, setShowSP] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [showResonance, setShowResonance] = useState(false);
+  const [showConstellation, setShowConstellation] = useState(false);
 
   useGameLoop(setGs);
   const { deleteSave } = useSave(gs, setGs);
@@ -30,6 +32,8 @@ function App() {
         onOpenSP={() => setShowSP(true)}
         onOpenHelp={() => setShowHelp(true)}
         onOpenResonance={() => setShowResonance(true)}
+        onOpenConstellation={() => setShowConstellation(true)}
+        onManualPrestige={() => setGs(prev => manualPrestige(prev))}
       />
       <div style={styles.layers}>
         {Array.from({ length: NUM_LAYERS }, (_, i) => (
@@ -60,6 +64,13 @@ function App() {
           gs={gs}
           onConfirm={() => { setGs(prev => resonance(prev)); setShowResonance(false); }}
           onCancel={() => setShowResonance(false)}
+        />
+      )}
+      {showConstellation && (
+        <ConstellationPanel
+          gs={gs}
+          onUnlock={i => setGs(prev => unlockConLayer(prev, i))}
+          onClose={() => setShowConstellation(false)}
         />
       )}
       <PrestigeFlash pcnt={gs.pcnt} />

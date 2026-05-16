@@ -1,6 +1,6 @@
 import React from "react";
 import type { GameState } from "../game/types";
-import { LCFG, tierThreshold } from "../game/config";
+import { LCFG, tierThreshold, getTierExp } from "../game/config";
 import { fmtN, fmtT } from "../utils/format";
 
 interface Props {
@@ -44,9 +44,11 @@ export function LayerCard({ gs, i, onUpgrade, onUnlock }: Props) {
   const progress = Math.min(1, layer.elapsed / layer.int);
   const remaining = Math.max(0, layer.int - layer.elapsed);
   const upgradeMul = Math.pow(layer.upgrades + 1, 0.2);
-  const tierExp = Math.pow(1.01, layer.pct);
+  const tierExpBase = getTierExp(gs.spu.deep);
+  const tierExp = Math.pow(tierExpBase, layer.pct);
   const bonusVal = Math.pow((1 + layer.gainBonus) * gs.resonanceMul, tierExp);
-  const effectiveGain = layer.gain * bonusVal * gm;
+  const ceMul = gs.ce > 0 ? Math.pow(1 + gs.ce, 0.1) : 1;
+  const effectiveGain = layer.gain * bonusVal * gm * ceMul;
   const effectiveBp = layer.bp * upgradeMul;
   const canUpgrade = gs.res >= layer.cost;
   const nextTierAt = tierThreshold(layer.pct + 1);

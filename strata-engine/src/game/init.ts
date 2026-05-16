@@ -1,5 +1,5 @@
-import { NUM_LAYERS, LCFG } from "./config";
-import type { GameState, LayerState, SpUpgrades } from "./types";
+import { NUM_LAYERS, LCFG, CON_LCFG } from "./config";
+import type { GameState, LayerState, ConstellationLayer, SpUpgrades } from "./types";
 
 export const defaultSpu: SpUpgrades = { gMul: 0, speed: 0, boost: 0, gain: 0, deep: 0 };
 
@@ -24,6 +24,16 @@ export function mkLayer(i: number, spu: SpUpgrades): LayerState {
   };
 }
 
+export function mkConLayer(i: number): ConstellationLayer {
+  return {
+    unlocked: false,
+    int: CON_LCFG[i].t,
+    bi: CON_LCFG[i].t,
+    elapsed: 0,
+    efficiency: 1.0,
+  };
+}
+
 export function mkGs(sp: number, spu: SpUpgrades): GameState {
   return {
     res: 0,
@@ -36,5 +46,12 @@ export function mkGs(sp: number, spu: SpUpgrades): GameState {
     resonanceMul: 1,
     prevResonanceProduct: 0,
     resonanceCnt: 0,
+    cc: 0,
+    ce: 0,
+    conLayers: Array.from({ length: NUM_LAYERS }, (_, i) => mkConLayer(i)),
+    gtime: 0,
+    lastPrestigeGtime: 0,
+    memoryActive: false,
+    memoryCleared: false,
   };
 }

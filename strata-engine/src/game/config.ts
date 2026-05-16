@@ -1,9 +1,12 @@
 export const NUM_LAYERS = 8;
 export const GP_THRESHOLD = 1.7e308;
 
-// 累積アップグレード数のTierしきい値: Tier n に到達するには 5×n×(n+1) 回
 export function tierThreshold(tier: number): number {
   return 5 * tier * (tier + 1);
+}
+
+export function getTierExp(deep: number): number {
+  return deep > 0 ? 1.04 : 1.01;
 }
 
 export interface LayerCfg {
@@ -37,9 +40,27 @@ export interface SpDef {
 }
 
 export const SP_DEF: SpDef[] = [
-  { k: "gMul",  name: "Cosmic Resonance",  info: "+0.25 グローバル倍率/レベル", cost: 1, max: 10 },
-  { k: "speed", name: "Temporal Warp",     info: "全階層の基本インターバル −10%", cost: 2, max: 8  },
-  { k: "boost", name: "Cascade Amplifier", info: "全ブースト加算値 +10%",        cost: 2, max: 10 },
-  { k: "gain",  name: "Primal Harvest",    info: "基本リソース獲得量 +30%",      cost: 1, max: 10 },
-  { k: "deep",  name: "Deep Resonance",    info: "階層プレスティージ指数 ^1.04", cost: 5, max: 1  },
+  { k: "gMul",  name: "Cosmic Resonance",  info: "+0.25 グローバル倍率/レベル",       cost: 1, max: 10 },
+  { k: "speed", name: "Temporal Warp",     info: "全階層の基本インターバル −10%/レベル", cost: 2, max: 8  },
+  { k: "boost", name: "Cascade Amplifier", info: "全ブースト加算値 +10%/レベル",        cost: 2, max: 10 },
+  { k: "gain",  name: "Primal Harvest",    info: "基本リソース獲得量 +30%/レベル",      cost: 1, max: 10 },
+  { k: "deep",  name: "Deep Resonance",    info: "階層プレスティージ指数 1.01→1.04",   cost: 5, max: 1  },
+];
+
+export interface ConLayerCfg {
+  n:  string;
+  c:  string;
+  t:  number; // base interval (seconds)
+  sp: number; // SP cost to unlock
+}
+
+export const CON_LCFG: ConLayerCfg[] = [
+  { n: "Nebula",      c: "#e17055", t: 3,    sp: 1  },
+  { n: "Pulsar",      c: "#74b9ff", t: 8,    sp: 2  },
+  { n: "Quasar",      c: "#a29bfe", t: 20,   sp: 3  },
+  { n: "Void",        c: "#fd79a8", t: 50,   sp: 5  },
+  { n: "Singularity", c: "#00b894", t: 120,  sp: 8  },
+  { n: "Membrane",    c: "#fdcb6e", t: 300,  sp: 13 },
+  { n: "Manifold",    c: "#55efc4", t: 750,  sp: 21 },
+  { n: "Vertex",      c: "#b2bec3", t: 1800, sp: 34 },
 ];

@@ -1,6 +1,6 @@
-import { LCFG, SP_DEF, tierThreshold } from "./config";
+import { LCFG, CON_LCFG, SP_DEF, tierThreshold } from "./config";
 import type { GameState, SpUpgrades } from "./types";
-import { mkGs } from "./init";
+import { mkGs, mkConLayer } from "./init";
 
 export function resonanceProduct(gs: GameState): number {
   return gs.layers.reduce((acc, l) => acc * (1 + l.gainBonus), 1);
@@ -20,7 +20,45 @@ export function resonance(prev: GameState): GameState {
   next.resonanceMul = newMul;
   next.prevResonanceProduct = product;
   next.resonanceCnt = prev.resonanceCnt + 1;
+  // Carry constellation and memory state through resonance
+  next.cc = prev.cc;
+  next.ce = prev.ce;
+  next.conLayers = prev.conLayers.map(cl => ({ ...cl }));
+  next.gtime = prev.gtime;
+  next.lastPrestigeGtime = prev.lastPrestigeGtime;
+  next.memoryActive = prev.memoryActive;
+  next.memoryCleared = prev.memoryCleared;
   return next;
+}
+
+export function doPrestige(prev: GameState): GameState {
+  const span = prev.gtime - prev.lastPrestigeGtime;
+  const memorySuccess = prev.memoryActive;
+  const willTriggerMemory = !prev.memoryActive && !prev.memoryCleared && prev.pcnt > 0 && span <= 1.0;
+
+  const spGain = prev.memoryCleared
+    ? Math.max(1, Math.floor(Math.log10(Math.max(prev.res, 10)) / 308))
+    : 1;
+  const next = mkGs(prev.sp + spGain, prev.spu);
+  next.pcnt = prev.pcnt + 1;
+  next.gtime = prev.gtime;
+  next.lastPrestigeGtime = prev.gtime;
+  next.memoryActive = willTriggerMemory;
+  next.memoryCleared = memorySuccess || prev.memoryCleared;
+
+  // Con layers stay unlocked but reset intervals and efficiency
+  next.conLayers = prev.conLayers.map((cl, i) => ({
+    ...mkConLayer(i),
+    unlocked: cl.unlocked,
+  }));
+  next.cc = prev.conLayers[0].unlocked ? 1 : 0;
+  next.ce = 0;
+  return next;
+}
+
+export function manualPrestige(prev: GameState): GameState {
+  if (!prev.memoryCleared) return prev;
+  return doPrestige(prev);
 }
 
 export function upgrade(prev: GameState, i: number): GameState {
@@ -52,6 +90,19 @@ export function unlock(prev: GameState, i: number): GameState {
   layers[i].unlocked = true;
 
   return { ...prev, res: prev.res - LCFG[i].uc, layers };
+}
+
+export function unlockConLayer(prev: GameState, i: number): GameState {
+  if (prev.conLayers[i].unlocked) return prev;
+  if (prev.sp < CON_LCFG[i].sp) return prev;
+
+  const conLayers = prev.conLayers.map(cl => ({ ...cl }));
+  conLayers[i].unlocked = true;
+
+  let cc = prev.cc;
+  if (i === 0) cc += 1; // First con layer immediately grants 1 CC
+
+  return { ...prev, sp: prev.sp - CON_LCFG[i].sp, conLayers, cc };
 }
 
 export function buySP(prev: GameState, k: keyof SpUpgrades): GameState {

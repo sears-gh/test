@@ -14,6 +14,14 @@ export interface LayerState {
   unlocked:  boolean;
 }
 
+export interface ConstellationLayer {
+  unlocked:   boolean;
+  int:        number;
+  bi:         number;
+  elapsed:    number;
+  efficiency: number; // starts at 1.0 (100%), increases by 0.05 per reset cycle
+}
+
 export interface SpUpgrades {
   gMul:  number;
   speed: number;
@@ -33,4 +41,13 @@ export interface GameState {
   resonanceMul:         number;
   prevResonanceProduct: number;
   resonanceCnt:         number;
+  // Constellation system
+  cc:                   number;  // Cosmic Cores
+  ce:                   number;  // Cosmic Energy (accumulated at cc/s)
+  conLayers:            ConstellationLayer[];
+  // Memory event tracking
+  gtime:                number;  // total game time in seconds
+  lastPrestigeGtime:    number;
+  memoryActive:         boolean; // 星列の記憶 in progress
+  memoryCleared:        boolean; // 星列の記憶 succeeded; new prestige rules apply
 }
