@@ -1,0 +1,23 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #050510;
+  font-family: 'Courier New', Courier, monospace;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  width: 100%;
+}
+
+button {
+  font-family: 'Courier New', Courier, monospace;
+}
+
+button:hover:not(:disabled) {
+  opacity: 0.85;
+}
