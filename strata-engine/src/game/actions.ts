@@ -14,7 +14,7 @@ export function canResonate(gs: GameState): boolean {
 export function resonance(prev: GameState): GameState {
   if (!canResonate(prev)) return prev;
   const product = resonanceProduct(prev);
-  const newMul = Math.pow(product, 1 / 16);
+  const newMul = Math.pow(product, 1 / (16 - prev.spu.resExp));
   const newMaxMul = Math.max(prev.maxResonanceMul, newMul);
 
   const next = mkGs(prev.sp, prev.spu);

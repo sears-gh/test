@@ -17,7 +17,7 @@ export function loadSave(): GameState | null {
     // Migrate new SpUpgrades fields
     const spu = gs.spu as unknown as Record<string, number>;
     const newSpuFields: (keyof typeof defaultSpu)[] = [
-      "halfTrigger", "resResidual",
+      "halfTrigger", "resResidual", "resExp",
       "ul2", "ul3", "ul4", "ul5", "ul6", "ul7", "ul8",
       "ceEff",
     ];

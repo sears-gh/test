@@ -39,24 +39,32 @@ export function tick(prev: GameState, dt: number): GameState {
       ticks++;
 
       const currentGm = prev.gmBase + gmBonus;
-      const tierExp = Math.pow(1.01, layer.pct) * (0.200 + tierStep * layer.pct);
+      const tierExpFull   = Math.pow(1.01, layer.pct);
+      const linearBoostExp = 0.200 + tierStep * layer.pct;
       const upgradeMul = Math.pow(layer.upgrades + 1, 0.2) * (1 + 0.1 * layer.pct);
-      let bonusVal = Math.pow((1 + layer.gainBonus) * prev.resonanceMul, tierExp);
-      if (prev.memoryActive) bonusVal = Math.pow(bonusVal, 0.9);
+      const baseVal = (1 + layer.gainBonus) * prev.resonanceMul;
+      // Bonus = baseVal^(1.01^Tier)  — applied to SC gain
+      // bonusForBoost = Bonus^(0.200+0.005×Tier) = baseVal^(tierExpFull × linearBoostExp) — applied to gMult/Boost
+      let bonusForGain  = Math.pow(baseVal, tierExpFull);
+      let bonusForBoost = Math.pow(baseVal, tierExpFull * linearBoostExp);
+      if (prev.memoryActive) {
+        bonusForGain  = Math.pow(bonusForGain,  0.9);
+        bonusForBoost = Math.pow(bonusForBoost, 0.9);
+      }
 
       const isGain = layer.firstFire || Math.random() < 0.5;
       if (layer.firstFire) layer.firstFire = false;
 
       if (isGain) {
         // ── Gain event ──
-        const gained = layer.gain * bonusVal * currentGm * ceMul;
+        const gained = layer.gain * bonusForGain * currentGm * ceMul;
         res += gained;
         layer.evt = "gain";
         layer.evtAmt = gained;
 
         // Secondary: trigger gm/boost at 1/10 strength
         if (secStrength > 0) {
-          const secBp = layer.bp * upgradeMul * secStrength;
+          const secBp = layer.bp * upgradeMul * bonusForBoost * secStrength;
           if (i === 0) {
             gmBonus += secBp;
           } else {
@@ -68,12 +76,12 @@ export function tick(prev: GameState, dt: number): GameState {
       } else {
         // ── gm / boost event ──
         if (i === 0) {
-          const gmAdd = layer.bp * upgradeMul;
+          const gmAdd = layer.bp * upgradeMul * bonusForBoost;
           gmBonus += gmAdd;
           layer.evt = "gm";
           layer.evtAmt = gmAdd;
         } else {
-          const bpAdd = layer.bp * upgradeMul;
+          const bpAdd = layer.bp * upgradeMul * bonusForBoost;
           for (let j = 0; j < i; j++) {
             if (layersMut[j].unlocked) layersMut[j].gainBonus += bpAdd;
           }
@@ -83,7 +91,7 @@ export function tick(prev: GameState, dt: number): GameState {
 
         // Secondary: trigger gain at 1/10 strength
         if (secStrength > 0) {
-          res += layer.gain * bonusVal * currentGm * ceMul * secStrength;
+          res += layer.gain * bonusForGain * currentGm * ceMul * secStrength;
         }
       }
 

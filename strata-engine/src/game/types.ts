@@ -31,6 +31,7 @@ export interface SpUpgrades {
   deep:        number;
   halfTrigger: number;
   resResidual: number;
+  resExp:      number;
   ul2:         number;
   ul3:         number;
   ul4:         number;

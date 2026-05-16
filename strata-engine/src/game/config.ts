@@ -56,6 +56,7 @@ export const SP_DEF: SpDef[] = [
   { k: "deep",        name: "Deep Resonance",     info: "Tier指数ステップ 0.005→0.010 / Tier",          cost: 5,  max: 1,  group: "core"    },
   { k: "halfTrigger", name: "Dual Cascade",       info: "発火時、外れた効果も1/10で発動 (全層適用)",       cost: 5,  max: 1,  group: "core"    },
   { k: "resResidual", name: "Resonance Residual", info: "周回開始時、歴代最大 resonanceMul の10%を初期適用", cost: 15, max: 1,  group: "core"    },
+  { k: "resExp",      name: "Resonance Tuning",  info: "Resonance指数の分母 -1/レベル (16→8まで)",        cost: 20, max: 8,  group: "core"    },
 
   // ── 初期解放 ──
   { k: "ul2", name: "Atom 解放",     info: "周回開始時 Atom を解放済みにする",     cost: 3,   max: 1, group: "unlock" },

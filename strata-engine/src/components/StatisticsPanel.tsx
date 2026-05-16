@@ -22,25 +22,29 @@ export function StatisticsPanel({ gs, onClose }: Props) {
   // ── Per-layer derived stats ──────────────────────────────
   type LayerStat = {
     i: number;
-    fireRate: number;     // fires/s
-    bonusVal: number;
+    fireRate: number;
+    bonusForGain: number;
+    bonusForBoost: number;
     gainPerFire: number;
     resPerSec: number;
-    gmAddPerSec: number;  // only for i===0
-    bpAddPerSec: number;  // only for i>0
-    tierExp: number;
+    gmAddPerSec: number;
+    bpAddPerSec: number;
+    tierExpFull: number;
   };
 
   const layerStats: LayerStat[] = gs.layers.map((l, i) => {
     const fireRate = l.unlocked ? (0.5 / l.int) : 0;
     const upgradeMul = Math.pow(l.upgrades + 1, 0.2) * (1 + 0.1 * l.pct);
-    const te = Math.pow(1.01, l.pct) * (0.200 + tierStep * l.pct);
-    const bonusVal = Math.pow((1 + l.gainBonus) * gs.resonanceMul, te);
-    const gainPerFire = l.gain * bonusVal * gm * ceMul;
+    const tierExpFull    = Math.pow(1.01, l.pct);
+    const linearBoostExp = 0.200 + tierStep * l.pct;
+    const baseVal        = (1 + l.gainBonus) * gs.resonanceMul;
+    const bonusForGain   = Math.pow(baseVal, tierExpFull);
+    const bonusForBoost  = Math.pow(baseVal, tierExpFull * linearBoostExp);
+    const gainPerFire = l.gain * bonusForGain * gm * ceMul;
     const resPerSec = fireRate * gainPerFire;
-    const gmAddPerSec = i === 0 ? fireRate * l.bp * upgradeMul : 0;
-    const bpAddPerSec = i > 0 ? fireRate * l.bp * upgradeMul : 0;
-    return { i, fireRate, bonusVal, gainPerFire, resPerSec, gmAddPerSec, bpAddPerSec, tierExp: te };
+    const gmAddPerSec = i === 0 ? fireRate * l.bp * upgradeMul * bonusForBoost : 0;
+    const bpAddPerSec = i > 0 ? fireRate * l.bp * upgradeMul * bonusForBoost : 0;
+    return { i, fireRate, bonusForGain, bonusForBoost, gainPerFire, resPerSec, gmAddPerSec, bpAddPerSec, tierExpFull };
   });
 
   const totalResPerSec = layerStats.reduce((s, ls) => s + ls.resPerSec, 0);
@@ -94,7 +98,7 @@ export function StatisticsPanel({ gs, onClose }: Props) {
                     <tr key={i}>
                       <Td style={{ color: LCFG[i].c }}>{LCFG[i].n}</Td>
                       <Td right>{fmtN(ls.resPerSec)}</Td>
-                      <Td right dim>×{fmtN(ls.bonusVal)}</Td>
+                      <Td right dim>×{fmtN(ls.bonusForGain)}</Td>
                       <Td right dim>×{gm.toFixed(3)}</Td>
                       <Td right dim>×{ceMul.toFixed(3)}</Td>
                       <Td right>{pct(ls.resPerSec, totalResPerSec)}</Td>
@@ -127,8 +131,8 @@ export function StatisticsPanel({ gs, onClose }: Props) {
                 <tr>
                   <Th>層</Th>
                   <Th right>gainBonus</Th>
-                  <Th right>tierExp</Th>
-                  <Th right>bonusVal</Th>
+                  <Th right>^(1.01^Tier)</Th>
+                  <Th right>Bonus</Th>
                   <Th right>+/s</Th>
                 </tr>
               </thead>
@@ -140,8 +144,8 @@ export function StatisticsPanel({ gs, onClose }: Props) {
                     <tr key={i}>
                       <Td style={{ color: LCFG[i].c }}>{LCFG[i].n}</Td>
                       <Td right>+{fmtN(l.gainBonus)}</Td>
-                      <Td right dim>^{ls.tierExp.toFixed(3)}</Td>
-                      <Td right>×{fmtN(ls.bonusVal)}</Td>
+                      <Td right dim>^{ls.tierExpFull.toFixed(3)}</Td>
+                      <Td right>×{fmtN(ls.bonusForGain)}</Td>
                       <Td right dim>
                         {gainBonusGrowthPerSec[i] > 0
                           ? `+${fmtN(gainBonusGrowthPerSec[i])}/s`

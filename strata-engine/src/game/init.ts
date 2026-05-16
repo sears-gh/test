@@ -3,7 +3,7 @@ import type { GameState, LayerState, ConstellationLayer, SpUpgrades } from "./ty
 
 export const defaultSpu: SpUpgrades = {
   gMul: 0, speed: 0, boost: 0, gain: 0, deep: 0,
-  halfTrigger: 0, resResidual: 0,
+  halfTrigger: 0, resResidual: 0, resExp: 0,
   ul2: 0, ul3: 0, ul4: 0, ul5: 0, ul6: 0, ul7: 0, ul8: 0,
   ceEff: 0,
 };
