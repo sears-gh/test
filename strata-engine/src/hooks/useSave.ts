@@ -35,6 +35,7 @@ export function loadSave(): GameState | null {
     gs.maxResonanceMul = gs.maxResonanceMul ?? (gs.resonanceMul ?? 1);
     gs.compressLevel = gs.compressLevel ?? 0;
     gs.compressCost  = gs.compressCost  ?? 1;
+    gs.layers.forEach(l => { l.firstFire = l.firstFire ?? false; });
 
     if (!gs.conLayers || gs.conLayers.length !== NUM_LAYERS) {
       gs.conLayers = Array.from({ length: NUM_LAYERS }, (_, i) => mkConLayer(i));

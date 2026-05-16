@@ -96,6 +96,7 @@ export function unlock(prev: GameState, i: number): GameState {
 
   const layers = prev.layers.map(l => ({ ...l }));
   layers[i].unlocked = true;
+  layers[i].firstFire = true;
 
   return { ...prev, res: prev.res - LCFG[i].uc, layers };
 }

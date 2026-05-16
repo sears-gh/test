@@ -29,6 +29,7 @@ export function mkLayer(i: number, spu: SpUpgrades): LayerState {
     evt: "",
     evtAmt: 0,
     unlocked: i === 0 || preUnlocked,
+    firstFire: i === 0 || preUnlocked,
   };
 }
 

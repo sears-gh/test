@@ -44,7 +44,10 @@ export function tick(prev: GameState, dt: number): GameState {
       let bonusVal = Math.pow((1 + layer.gainBonus) * prev.resonanceMul, tierExp);
       if (prev.memoryActive) bonusVal = Math.pow(bonusVal, 0.9);
 
-      if (Math.random() < 0.5) {
+      const isGain = layer.firstFire || Math.random() < 0.5;
+      if (layer.firstFire) layer.firstFire = false;
+
+      if (isGain) {
         // ── Gain event ──
         const gained = layer.gain * bonusVal * currentGm * ceMul;
         res += gained;
