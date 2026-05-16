@@ -1,6 +1,7 @@
 import React from "react";
 import type { GameState, SpUpgrades } from "../game/types";
 import { SP_DEF, getSpNextCost } from "../game/config";
+import { fmtSP } from "../utils/format";
 
 interface Props {
   gs: GameState;
@@ -25,7 +26,7 @@ export function SpShop({ gs, onBuy, onClose }: Props) {
       <div style={s.panel} onClick={e => e.stopPropagation()}>
         <div style={s.header}>
           <span style={s.title}>★ SP SHOP</span>
-          <span style={s.spBal}>SP: <span style={s.spVal}>{gs.sp}</span></span>
+          <span style={s.spBal}>SP: <span style={s.spVal}>{fmtSP(gs.sp)}</span></span>
           <button style={s.closeBtn} onClick={onClose}>✕</button>
         </div>
 
@@ -73,12 +74,6 @@ export function SpShop({ gs, onBuy, onClose }: Props) {
   );
 }
 
-function fmtSP(n: number): string {
-  if (n < 1000) return n.toString();
-  if (n < 1e6) return (n / 1000).toFixed(1) + "K";
-  if (n < 1e9) return (n / 1e6).toFixed(1) + "M";
-  return n.toExponential(2);
-}
 
 const s: Record<string, React.CSSProperties> = {
   overlay: {

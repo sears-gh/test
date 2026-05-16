@@ -1,7 +1,7 @@
 import React from "react";
 import type { GameState } from "../game/types";
 import { GP_THRESHOLD } from "../game/config";
-import { fmtN } from "../utils/format";
+import { fmtN, fmtSP } from "../utils/format";
 import { canResonate } from "../game/actions";
 
 interface Props {
@@ -78,7 +78,7 @@ export function Header({
           )}
         </span>
         {hasSP && (
-          <span style={styles.spText}>SP: <span style={styles.spVal}>{gs.sp}</span></span>
+          <span style={styles.spText}>SP: <span style={styles.spVal}>{fmtSP(gs.sp)}</span></span>
         )}
       </div>
 

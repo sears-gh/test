@@ -66,7 +66,7 @@ export const SP_DEF: SpDef[] = [
   { k: "ul8", name: "Cosmos 解放",   info: "周回開始時 Cosmos を解放済みにする",   cost: 150, max: 1, group: "unlock" },
 
   // ── 星座機構 ──
-  { k: "ceEff",    name: "CE効率強化",       info: "CE倍率の指数 +0.05 (コスト毎回 ×1000)",                     cost: 3, max: -1, costMul: 1000, group: "con"  },
+  { k: "ceEff",    name: "CE効率強化",       info: "CE倍率の指数 +0.05 (コスト毎回 ×1000)",                     cost: 1e6, max: -1, costMul: 1000, group: "con"  },
   { k: "compress", name: "Interval Compression", info: "全星列階層のインターバル ×0.995/レベル (コスト毎回 ×10)", cost: 1, max: -1, costMul: 10,   group: "core" },
 ];
 
@@ -82,8 +82,8 @@ export const CON_LCFG: ConLayerCfg[] = [
   { n: "Pulsar",      c: "#74b9ff", t: 8,    sp: 250   },
   { n: "Quasar",      c: "#a29bfe", t: 20,   sp: 600   },
   { n: "Void",        c: "#fd79a8", t: 50,   sp: 1500  },
-  { n: "Singularity", c: "#00b894", t: 120,  sp: 3500  },
-  { n: "Membrane",    c: "#fdcb6e", t: 300,  sp: 8000  },
-  { n: "Manifold",    c: "#55efc4", t: 750,  sp: 20000 },
-  { n: "Vertex",      c: "#b2bec3", t: 1800, sp: 50000 },
+  { n: "Singularity", c: "#00b894", t: 120,  sp: 1e6  },
+  { n: "Membrane",    c: "#fdcb6e", t: 300,  sp: 1e9  },
+  { n: "Manifold",    c: "#55efc4", t: 750,  sp: 1e12 },
+  { n: "Vertex",      c: "#b2bec3", t: 1800, sp: 1e15 },
 ];

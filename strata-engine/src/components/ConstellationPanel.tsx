@@ -1,7 +1,7 @@
 import React from "react";
 import type { GameState } from "../game/types";
 import { CON_LCFG, NUM_LAYERS } from "../game/config";
-import { fmtN, fmtT } from "../utils/format";
+import { fmtN, fmtT, fmtSP } from "../utils/format";
 
 interface Props {
   gs: GameState;
@@ -17,7 +17,7 @@ export function ConstellationPanel({ gs, onUnlock, onClose }: Props) {
       <div style={styles.panel} onClick={e => e.stopPropagation()}>
         <div style={styles.header}>
           <span style={styles.title}>✦ 星座機構</span>
-          <span style={styles.spBal}>SP: <span style={styles.spVal}>{gs.sp}</span></span>
+          <span style={styles.spBal}>SP: <span style={styles.spVal}>{fmtSP(gs.sp)}</span></span>
           <button style={styles.closeBtn} onClick={onClose}>✕</button>
         </div>
 

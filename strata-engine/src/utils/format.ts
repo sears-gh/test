@@ -22,6 +22,16 @@ export function fmtN(n: number): string {
   return n.toExponential(3);
 }
 
+// SP 専用フォーマット: 整数表示 + 大きい数は suffix
+export function fmtSP(n: number): string {
+  if (n < 1000) return Math.floor(n).toString();
+  if (n < 1e6)  return (n / 1e3).toFixed(1).replace(/\.0$/, "") + "K";
+  if (n < 1e9)  return (n / 1e6).toFixed(2).replace(/\.?0+$/, "") + "M";
+  if (n < 1e12) return (n / 1e9).toFixed(2).replace(/\.?0+$/, "") + "B";
+  if (n < 1e15) return (n / 1e12).toFixed(2).replace(/\.?0+$/, "") + "T";
+  return n.toExponential(2);
+}
+
 export function fmtT(s: number): string {
   if (s <= 0) return "0s";
   if (s < 0.01) return `${(s * 1000).toFixed(1)}ms`;
