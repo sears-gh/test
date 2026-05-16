@@ -40,7 +40,7 @@ export function Header({ gs, onOpenSP, onOpenHelp, onOpenResonance }: Props) {
       </div>
       <div style={styles.barWrap}>
         <div style={styles.barBg}>
-          <div style={{ ...styles.barFill, width: `${gpPct}%` }} />
+          <div style={{ ...styles.barFill, transform: `scaleX(${gpPct / 100})` }} />
         </div>
         <span style={styles.barLabel}>Prestige {gpPct.toFixed(1)}%</span>
       </div>
@@ -135,10 +135,12 @@ const styles: Record<string, React.CSSProperties> = {
     overflow: "hidden",
   },
   barFill: {
+    width: "100%",
     height: "100%",
     background: "linear-gradient(90deg, #00ffcc, #ffd700)",
     borderRadius: 3,
-    transition: "width 0.3s ease",
+    transformOrigin: "left",
+    transition: "transform 0.3s ease",
     boxShadow: "0 0 8px #00ffcc66",
   },
   barLabel: {

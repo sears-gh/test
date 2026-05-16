@@ -93,7 +93,7 @@ export function LayerCard({ gs, i, onUpgrade, onUnlock }: Props) {
           <div
             style={{
               ...styles.barFill,
-              width: `${progress * 100}%`,
+              transform: `scaleX(${progress})`,
               background: `linear-gradient(90deg, ${cfg.c}88, ${cfg.c})`,
               boxShadow: layer.flash > 0 ? `0 0 8px ${cfg.c}` : "none",
             }}
@@ -204,9 +204,11 @@ const styles: Record<string, React.CSSProperties> = {
     overflow: "hidden",
   },
   barFill: {
+    width: "100%",
     height: "100%",
     borderRadius: 4,
-    transition: "width 0.05s linear",
+    transformOrigin: "left",
+    willChange: "transform",
   },
   timerText: {
     color: "#8888cc",
