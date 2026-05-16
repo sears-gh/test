@@ -264,35 +264,55 @@ export function StatisticsPanel({ gs, onClose }: Props) {
             <Row label="◈ コスト削減" val={`÷${gs.resonanceMul.toFixed(4)}  (upgrade/unlock/compress)`} />
             <Row label="◈ Compress加算" val={`+${Math.floor(gs.resonanceMul)} Lv (Resonance時リセット→付与)`} />
             <Row label="回数" val={`${gs.resonanceCnt}回`} />
-            <Row label="現在の積 Π(1+gainBonus)" val={fmtN(gs.layers.reduce((a, l) => a * (1 + l.gainBonus), 1))} />
-            <Row label="前回の積" val={fmtN(gs.prevResonanceProduct)} />
-            <div style={s.tableWrap}>
-              <table style={s.table}>
-                <thead>
-                  <tr>
-                    <Th>層</Th>
-                    <Th right>1+gainBonus</Th>
-                    <Th right>対数寄与率</Th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {gs.layers.map((l, i) => {
-                    if (!l.unlocked) return null;
-                    const contrib = 1 + l.gainBonus;
-                    const product = gs.layers.reduce((a, ll) => a * (1 + ll.gainBonus), 1);
-                    return (
-                      <tr key={i}>
-                        <Td style={{ color: LCFG[i].c }}>{LCFG[i].n}</Td>
-                        <Td right>×{fmtN(contrib)}</Td>
-                        <Td right dim>
-                          {product > 1 ? `${((Math.log(contrib) / Math.log(product)) * 100).toFixed(1)}%` : "—"}
-                        </Td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+            {(() => {
+              const rawGm = gs.gmBase + gs.gmBonus;
+              const product = gs.layers.reduce((acc, l) => {
+                return acc * Math.pow(1 + l.gainBonus, Math.pow(1.05, l.pct));
+              }, rawGm);
+              const logP = Math.log(Math.max(product, 1e-300));
+              return (
+                <>
+                  <Row label="現在の積" val={fmtN(product)} />
+                  <Row label="前回の積" val={fmtN(gs.prevResonanceProduct)} />
+                  <div style={s.tableWrap}>
+                    <table style={s.table}>
+                      <thead>
+                        <tr>
+                          <Th>要素</Th>
+                          <Th right>1+bonus</Th>
+                          <Th right>^(1.05^T)</Th>
+                          <Th right>寄与</Th>
+                          <Th right>対数%</Th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <Td dim>rawGm</Td>
+                          <Td right>×{fmtN(rawGm)}</Td>
+                          <Td right dim>^1</Td>
+                          <Td right>{fmtN(rawGm)}</Td>
+                          <Td right dim>{logP > 0 ? `${(Math.log(rawGm) / logP * 100).toFixed(1)}%` : "—"}</Td>
+                        </tr>
+                        {gs.layers.map((l, i) => {
+                          if (!l.unlocked) return null;
+                          const te = Math.pow(1.05, l.pct);
+                          const contrib = Math.pow(1 + l.gainBonus, te);
+                          return (
+                            <tr key={i}>
+                              <Td style={{ color: LCFG[i].c }}>{LCFG[i].n}</Td>
+                              <Td right>+{fmtN(l.gainBonus)}</Td>
+                              <Td right dim>^{te.toFixed(3)}</Td>
+                              <Td right>×{fmtN(contrib)}</Td>
+                              <Td right dim>{logP > 0 ? `${(Math.log(Math.max(contrib, 1e-300)) / logP * 100).toFixed(1)}%` : "—"}</Td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              );
+            })()}
           </Section>
         )}
 

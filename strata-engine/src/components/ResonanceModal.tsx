@@ -10,7 +10,7 @@ interface Props {
 
 export function ResonanceModal({ gs, onConfirm, onCancel }: Props) {
   const product = resonanceProduct(gs);
-  const newMul = Math.pow(product, 1 / 16);
+  const newMul = Math.pow(product, 1 / (16 - gs.spu.resExp));
   const ok = canResonate(gs);
 
   return (
@@ -19,7 +19,7 @@ export function ResonanceModal({ gs, onConfirm, onCancel }: Props) {
         <div style={styles.title}>◈ RESONANCE</div>
 
         <div style={styles.section}>
-          <div style={styles.label}>全階層ボーナス積</div>
+          <div style={styles.label}>gm × Π( (1+bonus)^(1.05^Tier) )</div>
           <div style={styles.value}>{product.toExponential(4)}</div>
           {!ok && (
             <div style={styles.warn}>

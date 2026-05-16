@@ -3,7 +3,11 @@ import type { GameState, SpUpgrades } from "./types";
 import { mkGs, mkConLayer } from "./init";
 
 export function resonanceProduct(gs: GameState): number {
-  return gs.layers.reduce((acc, l) => acc * (1 + l.gainBonus), 1);
+  const rawGm = gs.gmBase + gs.gmBonus;
+  return gs.layers.reduce((acc, l) => {
+    const tierExp = Math.pow(1.05, l.pct);
+    return acc * Math.pow(1 + l.gainBonus, tierExp);
+  }, rawGm);
 }
 
 export function canResonate(gs: GameState): boolean {
