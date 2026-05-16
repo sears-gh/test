@@ -18,7 +18,7 @@ export interface LayerCfg {
 }
 
 export const LCFG: LayerCfg[] = [
-  { n: "Quark",    c: "#ff6b9d", t: 2.5,  g: 1,      b: 0.030, uB: 10,    uM: 2.0, uc: 0       },
+  { n: "Quark",    c: "#ff6b9d", t: 2.5,  g: 1,      b: 0.002, uB: 10,    uM: 2.0, uc: 0       },
   { n: "Atom",     c: "#ff9f43", t: 6,    g: 20,     b: 0.060, uB: 90,    uM: 2.1, uc: 30      },
   { n: "Cell",     c: "#f9ca24", t: 14,   g: 300,    b: 0.100, uB: 1200,  uM: 2.2, uc: 400     },
   { n: "Organism", c: "#6ab04c", t: 32,   g: 4500,   b: 0.155, uB: 20000, uM: 2.3, uc: 6000    },

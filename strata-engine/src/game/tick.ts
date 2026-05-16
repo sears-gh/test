@@ -37,7 +37,7 @@ export function tick(prev: GameState, dt: number): GameState {
         layer.evtAmt = gained;
       } else {
         if (i === 0) {
-          const gmAdd = 0.002 * upgradeMul;
+          const gmAdd = layer.bp * upgradeMul;
           gmBonus += gmAdd;
           layer.evt = "gm";
           layer.evtAmt = gmAdd;
