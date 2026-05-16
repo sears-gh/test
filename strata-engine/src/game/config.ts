@@ -5,8 +5,9 @@ export function tierThreshold(tier: number): number {
   return 5 * tier * (tier + 1);
 }
 
-export function getTierExp(deep: number): number {
-  return deep > 0 ? 1.04 : 1.01;
+// tierStep: base per-tier addend to the bonusVal exponent (0.200 + step×pct)
+export function getTierStep(deep: number): number {
+  return deep > 0 ? 0.010 : 0.005;
 }
 
 export interface LayerCfg {
@@ -52,7 +53,7 @@ export const SP_DEF: SpDef[] = [
   { k: "speed",       name: "Temporal Warp",      info: "全階層の基本インターバル −10%/レベル",            cost: 2,  max: 8,  group: "core"    },
   { k: "boost",       name: "Cascade Amplifier",  info: "全ブースト加算値 +10%/レベル",                  cost: 2,  max: 10, group: "core"    },
   { k: "gain",        name: "Primal Harvest",     info: "基本リソース獲得量 +30%/レベル",                 cost: 1,  max: 10, group: "core"    },
-  { k: "deep",        name: "Deep Resonance",     info: "階層プレスティージ指数 1.01→1.04",              cost: 5,  max: 1,  group: "core"    },
+  { k: "deep",        name: "Deep Resonance",     info: "Tier指数ステップ 0.005→0.010 / Tier",          cost: 5,  max: 1,  group: "core"    },
   { k: "halfTrigger", name: "Dual Cascade",       info: "発火時、外れた効果も1/10で発動 (全層適用)",       cost: 5,  max: 1,  group: "core"    },
   { k: "resResidual", name: "Resonance Residual", info: "周回開始時、歴代最大 resonanceMul の10%を初期適用", cost: 15, max: 1,  group: "core"    },
 

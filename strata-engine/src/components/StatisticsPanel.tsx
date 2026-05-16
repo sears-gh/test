@@ -1,6 +1,6 @@
 import React from "react";
 import type { GameState } from "../game/types";
-import { LCFG, CON_LCFG, getTierExp } from "../game/config";
+import { LCFG, CON_LCFG, getTierStep } from "../game/config";
 import { fmtN, fmtT } from "../utils/format";
 
 interface Props {
@@ -17,7 +17,7 @@ export function StatisticsPanel({ gs, onClose }: Props) {
   const gm = gs.gmBase + gs.gmBonus;
   const ceExp = 0.1 + gs.spu.ceEff * 0.05;
   const ceMul = gs.ce > 0 ? Math.pow(1 + gs.ce, ceExp) : 1;
-  const tierExpBase = getTierExp(gs.spu.deep);
+  const tierStep = getTierStep(gs.spu.deep);
 
   // ── Per-layer derived stats ──────────────────────────────
   type LayerStat = {
@@ -33,8 +33,8 @@ export function StatisticsPanel({ gs, onClose }: Props) {
 
   const layerStats: LayerStat[] = gs.layers.map((l, i) => {
     const fireRate = l.unlocked ? (0.5 / l.int) : 0;
-    const upgradeMul = Math.pow(l.upgrades + 1, 0.2);
-    const te = Math.pow(tierExpBase, l.pct);
+    const upgradeMul = Math.pow(l.upgrades + 1, 0.2) * (1 + 0.1 * l.pct);
+    const te = 0.200 + tierStep * l.pct;
     const bonusVal = Math.pow((1 + l.gainBonus) * gs.resonanceMul, te);
     const gainPerFire = l.gain * bonusVal * gm * ceMul;
     const resPerSec = fireRate * gainPerFire;

@@ -1,4 +1,4 @@
-import { GP_THRESHOLD, getTierExp } from "./config";
+import { GP_THRESHOLD, getTierStep } from "./config";
 import type { GameState, LayerState, ConstellationLayer } from "./types";
 import { doPrestige } from "./actions";
 
@@ -20,7 +20,7 @@ export function tick(prev: GameState, dt: number): GameState {
 
   const ceExp = 0.1 + prev.spu.ceEff * 0.05;
   const ceMul = ce > 0 ? Math.pow(1 + ce, ceExp) : 1;
-  const tierExpBase = getTierExp(prev.spu.deep);
+  const tierStep = getTierStep(prev.spu.deep);
   const secStrength = prev.spu.halfTrigger > 0 ? 0.1 : 0;
   const compressMul = Math.pow(0.995, prev.compressLevel);
 
@@ -39,8 +39,8 @@ export function tick(prev: GameState, dt: number): GameState {
       ticks++;
 
       const currentGm = prev.gmBase + gmBonus;
-      const upgradeMul = Math.pow(layer.upgrades + 1, 0.2);
-      const tierExp = Math.pow(tierExpBase, layer.pct);
+      const tierExp = 0.200 + tierStep * layer.pct;
+      const upgradeMul = Math.pow(layer.upgrades + 1, 0.2) * (1 + 0.1 * layer.pct);
       let bonusVal = Math.pow((1 + layer.gainBonus) * prev.resonanceMul, tierExp);
       if (prev.memoryActive) bonusVal = Math.pow(bonusVal, 0.9);
 

@@ -81,13 +81,15 @@ export function upgrade(prev: GameState, i: number): GameState {
   l.int *= 0.8;
   l.upgrades += 1;
 
+  let gmBonus = prev.gmBonus;
   if (l.upgrades >= tierThreshold(l.pct + 1)) {
+    gmBonus += l.gainBonus; // Tier上昇: 蓄積したBonus → gMult加算
     l.int = l.bi;
     l.elapsed = 0;
     l.pct += 1;
   }
 
-  return { ...prev, res, layers };
+  return { ...prev, res, layers, gmBonus };
 }
 
 export function unlock(prev: GameState, i: number): GameState {
