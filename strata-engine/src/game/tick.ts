@@ -7,10 +7,11 @@ export function tick(prev: GameState, dt: number): GameState {
     return doPrestige(prev);
   }
 
-  let res = prev.res;
-  let gmBonus = prev.gmBonus;
-  let ce = prev.ce;
-  let cc = prev.cc;
+  let res          = prev.res;
+  let gmBonus      = prev.gmBonus;
+  let ce           = prev.ce;
+  let cc           = prev.cc;
+  let totalSCGained = prev.totalSCGained;
   const gtime = prev.gtime + dt;
 
   const layersMut: LayerState[] = prev.layers.map(l => ({ ...l }));
@@ -22,7 +23,8 @@ export function tick(prev: GameState, dt: number): GameState {
   const ceMul = ce > 0 ? Math.pow(1 + ce, ceExp) : 1;
   const tierStep = getTierStep(prev.spu.deep);
   const secStrength = prev.spu.halfTrigger > 0 ? 0.1 : 0;
-  const compressMul = Math.pow(0.95, prev.compressLevel + Math.floor(prev.resonanceMul));
+  const resonatorExp = Math.pow(1.02, prev.resonators);
+  const compressMul  = Math.pow(0.95, prev.compressLevel * resonatorExp);
 
   for (let i = 0; i < layersMut.length; i++) {
     const layer = layersMut[i];
@@ -61,6 +63,7 @@ export function tick(prev: GameState, dt: number): GameState {
         // ── Gain event ──
         const gained = layer.gain * bonusForGain * effectiveGm * ceMul;
         res += gained;
+        totalSCGained += gained;
         layer.evt = "gain";
         layer.evtAmt = gained;
 
@@ -93,7 +96,9 @@ export function tick(prev: GameState, dt: number): GameState {
 
         // Secondary: trigger gain at 1/10 strength
         if (secStrength > 0) {
-          res += layer.gain * bonusForGain * effectiveGm * ceMul * secStrength;
+          const secGained = layer.gain * bonusForGain * effectiveGm * ceMul * secStrength;
+          res += secGained;
+          totalSCGained += secGained;
         }
       }
 
@@ -136,9 +141,9 @@ export function tick(prev: GameState, dt: number): GameState {
   }
 
   if (!prev.memoryCleared && (res >= GP_THRESHOLD || res === Infinity)) {
-    const interim = { ...prev, res, gmBonus, layers: layersMut, conLayers: conMut, ce, cc, gtime };
+    const interim = { ...prev, res, gmBonus, layers: layersMut, conLayers: conMut, ce, cc, gtime, totalSCGained };
     return doPrestige(interim);
   }
 
-  return { ...prev, res, gmBonus, layers: layersMut, conLayers: conMut, ce, cc, gtime };
+  return { ...prev, res, gmBonus, layers: layersMut, conLayers: conMut, ce, cc, gtime, totalSCGained };
 }

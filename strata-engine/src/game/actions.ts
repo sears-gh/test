@@ -32,8 +32,15 @@ export function resonance(prev: GameState): GameState {
   next.conLayers = prev.conLayers.map(cl => ({ ...cl }));
   next.gtime = prev.gtime;
   next.lastPrestigeGtime = prev.lastPrestigeGtime;
-  next.memoryActive = prev.memoryActive;
+  next.memoryActive  = prev.memoryActive;
   next.memoryCleared = prev.memoryCleared;
+
+  // Resonator: floor(log10(累積SC) / 308) 個追加
+  const newResonators = Math.max(0, Math.floor(
+    Math.log10(Math.max(prev.totalSCGained, 10)) / 308
+  ));
+  next.resonators    = prev.resonators + newResonators;
+  next.totalSCGained = prev.totalSCGained; // 周回内は保持
 
   return next;
 }

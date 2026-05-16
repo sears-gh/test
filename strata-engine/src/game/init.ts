@@ -64,6 +64,8 @@ export function mkGs(sp: number, spu: SpUpgrades): GameState {
     memoryActive: false,
     memoryCleared: false,
     compressLevel: 0,
-    compressCost: 1,
+    compressCost:  1,
+    totalSCGained: 0,
+    resonators:    0,
   };
 }

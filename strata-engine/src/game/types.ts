@@ -61,6 +61,8 @@ export interface GameState {
   lastPrestigeGtime:    number;
   memoryActive:         boolean;
   memoryCleared:        boolean;
-  compressLevel:        number; // SC購入のInterval圧縮レベル
-  compressCost:         number; // 次のCompress購入コスト
+  compressLevel:        number;
+  compressCost:         number;
+  totalSCGained:        number; // 周回内累積SC（レゾナンスをまたいで保持）
+  resonators:           number; // 共振子（レゾナンス時に加算、周回リセット）
 }

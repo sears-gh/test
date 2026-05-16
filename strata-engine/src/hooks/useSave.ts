@@ -33,8 +33,10 @@ export function loadSave(): GameState | null {
     gs.memoryActive = gs.memoryActive ?? false;
     gs.memoryCleared = gs.memoryCleared ?? false;
     gs.maxResonanceMul = gs.maxResonanceMul ?? (gs.resonanceMul ?? 1);
-    gs.compressLevel = gs.compressLevel ?? 0;
-    gs.compressCost  = gs.compressCost  ?? 1;
+    gs.compressLevel  = gs.compressLevel  ?? 0;
+    gs.compressCost   = gs.compressCost   ?? 1;
+    gs.totalSCGained  = gs.totalSCGained  ?? 0;
+    gs.resonators     = gs.resonators     ?? 0;
     gs.layers.forEach(l => { l.firstFire = l.firstFire ?? false; });
 
     if (!gs.conLayers || gs.conLayers.length !== NUM_LAYERS) {
