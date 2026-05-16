@@ -11,6 +11,7 @@ export function upgrade(prev: GameState, i: number): GameState {
   const res = prev.res - l.cost;
   l.cost *= LCFG[i].uM;
   l.int *= 0.8;
+  l.upgrades += 1;
 
   if (l.int < LP_MIN) {
     const expo = 1.03 + prev.spu.deep * 0.01;

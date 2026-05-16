@@ -12,7 +12,7 @@ export function fmtN(n: number): string {
   }
 
   for (let i = SUFFIXES.length - 1; i >= 0; i--) {
-    const val = Math.pow(1000, i + 2);
+    const val = Math.pow(1000, i + 1);
     if (n >= val) {
       return (n / val).toFixed(3).slice(0, 4).replace(/\.?0+$/, "") + SUFFIXES[i];
     }

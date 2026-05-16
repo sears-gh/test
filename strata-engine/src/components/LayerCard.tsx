@@ -44,6 +44,8 @@ export function LayerCard({ gs, i, onUpgrade, onUnlock }: Props) {
   const progress = Math.min(1, layer.elapsed / layer.int);
   const remaining = Math.max(0, layer.int - layer.elapsed);
   const effectiveGain = layer.gain * (1 + layer.gainBonus) * gm;
+  const upgradeMul = Math.pow(layer.upgrades + 1, 0.2);
+  const effectiveBp = layer.bp * upgradeMul;
   const canUpgrade = gs.res >= layer.cost;
 
   const flashAlpha = layer.flash > 0 ? layer.flash / 0.65 : 0;
@@ -53,7 +55,7 @@ export function LayerCard({ gs, i, onUpgrade, onUnlock }: Props) {
   if (layer.flash > 0.4) {
     if (layer.evt === "gain") evtText = `+${fmtN(layer.evtAmt)}`;
     else if (layer.evt === "boost") evtText = `+${layer.evtAmt.toFixed(3)} bonus`;
-    else if (layer.evt === "gm") evtText = `+0.002 gMult`;
+    else if (layer.evt === "gm") evtText = `+${layer.evtAmt.toFixed(4)} gMult`;
   }
 
   return (
@@ -103,7 +105,7 @@ export function LayerCard({ gs, i, onUpgrade, onUnlock }: Props) {
         <div style={styles.stat}>
           <span style={styles.statLabel}>{i === 0 ? "gMult total" : "Boost+"}</span>
           <span style={styles.statVal}>
-            {i === 0 ? `×${gm.toFixed(3)}` : `+${layer.bp.toFixed(3)}`}
+            {i === 0 ? `×${gm.toFixed(3)}` : `+${effectiveBp.toFixed(3)}`}
           </span>
         </div>
         <div style={styles.stat}>
