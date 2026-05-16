@@ -6,6 +6,7 @@ export interface LayerState {
   gain:      number;
   bp:        number;
   gainBonus: number;
+  tierMul:   number;
   pct:       number;
   upgrades:  number;
   flash:     number;

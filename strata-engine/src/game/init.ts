@@ -15,6 +15,7 @@ export function mkLayer(i: number, spu: SpUpgrades): LayerState {
     gain: LCFG[i].g * gm,
     bp: LCFG[i].b * bm,
     gainBonus: 0,
+    tierMul: 1,
     pct: 0,
     upgrades: 0,
     flash: 0,

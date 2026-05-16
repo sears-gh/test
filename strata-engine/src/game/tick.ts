@@ -31,18 +31,18 @@ export function tick(prev: GameState, dt: number): GameState {
       const upgradeMul = Math.pow(layer.upgrades + 1, 0.2);
 
       if (Math.random() < 0.5) {
-        const gained = layer.gain * (1 + layer.gainBonus) * prev.resonanceMul * currentGm;
+        const gained = layer.gain * (1 + layer.gainBonus) * layer.tierMul * prev.resonanceMul * currentGm;
         res += gained;
         layer.evt = "gain";
         layer.evtAmt = gained;
       } else {
         if (i === 0) {
-          const gmAdd = layer.bp * upgradeMul;
+          const gmAdd = layer.bp * upgradeMul * layer.tierMul;
           gmBonus += gmAdd;
           layer.evt = "gm";
           layer.evtAmt = gmAdd;
         } else {
-          const bpAdd = layer.bp * upgradeMul;
+          const bpAdd = layer.bp * upgradeMul * layer.tierMul;
           for (let j = 0; j < i; j++) {
             if (layersMut[j].unlocked) {
               layersMut[j].gainBonus += bpAdd;

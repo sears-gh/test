@@ -2,8 +2,13 @@ import { LCFG, SP_DEF, tierThreshold } from "./config";
 import type { GameState, SpUpgrades } from "./types";
 import { mkGs } from "./init";
 
+// Bonus基礎値 per layer = gain × (1 + gainBonus) × tierMul
+export function bonusBase(l: { gain: number; gainBonus: number; tierMul: number }): number {
+  return l.gain * (1 + l.gainBonus) * l.tierMul;
+}
+
 export function resonanceProduct(gs: GameState): number {
-  return gs.layers.reduce((acc, l) => acc * (1 + l.gainBonus), 1);
+  return gs.layers.reduce((acc, l) => acc * bonusBase(l), 1);
 }
 
 export function canResonate(gs: GameState): boolean {
@@ -37,8 +42,7 @@ export function upgrade(prev: GameState, i: number): GameState {
 
   if (l.upgrades >= tierThreshold(l.pct + 1)) {
     const expo = 1.03 + prev.spu.deep * 0.01;
-    l.gain = Math.pow(l.gain, expo);
-    l.bp = Math.pow(l.bp, expo);
+    l.tierMul *= expo;
     l.int = l.bi;
     l.elapsed = 0;
     l.pct += 1;
