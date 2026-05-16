@@ -30,9 +30,6 @@ export function resonance(prev: GameState): GameState {
   next.lastPrestigeGtime = prev.lastPrestigeGtime;
   next.memoryActive = prev.memoryActive;
   next.memoryCleared = prev.memoryCleared;
-  // Compress は SC 消費なのでレゾナンス時にはリセットしない
-  next.compressLevel = prev.compressLevel;
-  next.compressCost = prev.compressCost;
   return next;
 }
 
