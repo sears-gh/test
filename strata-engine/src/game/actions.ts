@@ -35,9 +35,9 @@ export function resonance(prev: GameState): GameState {
   next.memoryActive  = prev.memoryActive;
   next.memoryCleared = prev.memoryCleared;
 
-  // Resonator: floor(log10(累積SC) / 308) 個追加
+  // Resonator: floor(log10(累積SC)) 個追加
   const newResonators = Math.max(0, Math.floor(
-    Math.log10(Math.max(prev.totalSCGained, 10)) / 308
+    Math.log10(Math.max(prev.totalSCGained, 1))
   ));
   next.resonators    = prev.resonators + newResonators;
   next.totalSCGained = prev.totalSCGained; // 周回内は保持
