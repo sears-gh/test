@@ -10,8 +10,13 @@ export const defaultSpu: SpUpgrades = {
 
 const PRE_UNLOCK_KEYS = ["ul2","ul3","ul4","ul5","ul6","ul7","ul8"] as const;
 
-export function mkLayer(i: number, spu: SpUpgrades): LayerState {
-  const bi = LCFG[i].t * Math.pow(0.9, spu.speed);
+export function mkLayer(
+  i: number,
+  spu: SpUpgrades,
+  challengesDone: [boolean, boolean, boolean] = [false, false, false]
+): LayerState {
+  const speedReward = challengesDone[0] ? 2 : 1;
+  const bi = LCFG[i].t * Math.pow(0.9, spu.speed) / speedReward;
   const bm = 1 + spu.boost * 0.1;
   const gm = 1 + spu.gain * 0.3;
   const preUnlocked = i > 0 && i <= 7 && spu[PRE_UNLOCK_KEYS[i - 1]] > 0;
@@ -43,14 +48,18 @@ export function mkConLayer(i: number): ConstellationLayer {
   };
 }
 
-export function mkGs(sp: number, spu: SpUpgrades): GameState {
+export function mkGs(
+  sp: number,
+  spu: SpUpgrades,
+  challengesDone: [boolean, boolean, boolean] = [false, false, false]
+): GameState {
   return {
     res: 0,
     sp,
     spu,
     gmBase: 1 + spu.gMul * 0.25,
     gmBonus: 0,
-    layers: Array.from({ length: NUM_LAYERS }, (_, i) => mkLayer(i, spu)),
+    layers: Array.from({ length: NUM_LAYERS }, (_, i) => mkLayer(i, spu, challengesDone)),
     pcnt: 0,
     resonanceMul: 1,
     prevResonanceProduct: 0,
@@ -68,5 +77,7 @@ export function mkGs(sp: number, spu: SpUpgrades): GameState {
     totalSCGained: 0,
     resonators:    0,
     autoUnlock:    false,
+    activeChallenge: null,
+    challengesDone,
   };
 }

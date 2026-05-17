@@ -63,7 +63,9 @@ export interface GameState {
   memoryCleared:        boolean;
   compressLevel:        number;
   compressCost:         number;
-  totalSCGained:        number; // 周回内累積SC（レゾナンスをまたいで保持）
-  resonators:           number; // 共振子（レゾナンス時に加算、周回リセット）
-  autoUnlock:           boolean; // 自動アンロック（pcnt≥3で解放）
+  totalSCGained:        number;
+  resonators:           number;
+  autoUnlock:           boolean;
+  activeChallenge:      number | null;  // null=通常, 0=C1, 1=C2, 2=C3
+  challengesDone:       [boolean, boolean, boolean];
 }

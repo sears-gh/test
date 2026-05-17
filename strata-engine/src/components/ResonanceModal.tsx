@@ -1,6 +1,7 @@
 import React from "react";
 import type { GameState } from "../game/types";
 import { resonanceProduct, canResonate } from "../game/actions";
+import { getResExpDenom } from "../game/config";
 
 interface Props {
   gs: GameState;
@@ -10,7 +11,8 @@ interface Props {
 
 export function ResonanceModal({ gs, onConfirm, onCancel }: Props) {
   const product = resonanceProduct(gs);
-  const newMul = Math.pow(product, 1 / (16 - gs.spu.resExp));
+  const denom = getResExpDenom(gs.spu, gs.activeChallenge, gs.challengesDone);
+  const newMul = Math.pow(product, 1 / denom);
   const ok = canResonate(gs);
 
   return (

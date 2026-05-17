@@ -1,4 +1,4 @@
-import { LCFG, CON_LCFG, SP_DEF, getSpNextCost, tierThreshold } from "./config";
+import { LCFG, CON_LCFG, SP_DEF, getSpNextCost, tierThreshold, getResExpDenom } from "./config";
 import type { GameState, SpUpgrades } from "./types";
 import { mkGs, mkConLayer } from "./init";
 
@@ -18,10 +18,11 @@ export function canResonate(gs: GameState): boolean {
 export function resonance(prev: GameState): GameState {
   if (!canResonate(prev)) return prev;
   const product = resonanceProduct(prev);
-  const newMul = Math.pow(product, 1 / (16 - prev.spu.resExp));
+  const denom = getResExpDenom(prev.spu, prev.activeChallenge, prev.challengesDone);
+  const newMul = Math.pow(product, 1 / denom);
   const newMaxMul = Math.max(prev.maxResonanceMul, newMul);
 
-  const next = mkGs(prev.sp, prev.spu);
+  const next = mkGs(prev.sp, prev.spu, prev.challengesDone);
   next.pcnt = prev.pcnt;
   next.resonanceMul = newMul;
   next.prevResonanceProduct = product;
@@ -34,13 +35,15 @@ export function resonance(prev: GameState): GameState {
   next.lastPrestigeGtime = prev.lastPrestigeGtime;
   next.memoryActive  = prev.memoryActive;
   next.memoryCleared = prev.memoryCleared;
+  next.activeChallenge = prev.activeChallenge;
+  next.challengesDone  = prev.challengesDone;
+  next.autoUnlock = prev.autoUnlock;
 
-  // Resonator: floor(log10(累積SC)) 個追加
   const newResonators = Math.max(0, Math.floor(
     Math.log10(Math.max(prev.totalSCGained, 1))
   ));
   next.resonators    = prev.resonators + newResonators;
-  next.totalSCGained = prev.totalSCGained; // 周回内は保持
+  next.totalSCGained = prev.totalSCGained;
 
   return next;
 }
@@ -54,15 +57,23 @@ export function doPrestige(prev: GameState): GameState {
     ? Math.max(1, Math.floor(Math.log10(Math.max(prev.res, 10)) / 308))
     : 1;
 
-  const next = mkGs(prev.sp + spGain, prev.spu);
+  // Challenge completion: mark done and clear active
+  const challengesDone = [...prev.challengesDone] as [boolean, boolean, boolean];
+  if (prev.activeChallenge !== null) {
+    challengesDone[prev.activeChallenge] = true;
+  }
+
+  const next = mkGs(prev.sp + spGain, prev.spu, challengesDone);
   next.pcnt = prev.pcnt + 1;
   next.gtime = prev.gtime;
   next.lastPrestigeGtime = prev.gtime;
   next.memoryActive = willTriggerMemory;
   next.memoryCleared = memorySuccess || prev.memoryCleared;
   next.maxResonanceMul = prev.maxResonanceMul;
+  next.activeChallenge = null;
+  next.challengesDone = challengesDone;
+  next.autoUnlock = prev.autoUnlock;
 
-  // Apply resonance residual: start with 10% of historical max
   if (prev.spu.resResidual > 0 && prev.maxResonanceMul > 1) {
     next.resonanceMul = 1 + (prev.maxResonanceMul - 1) * 0.1;
   }
@@ -81,11 +92,34 @@ export function manualPrestige(prev: GameState): GameState {
   return doPrestige(prev);
 }
 
+export function enterChallenge(prev: GameState, i: number): GameState {
+  if (prev.pcnt < 5) return prev;
+  if (prev.activeChallenge !== null) return prev;
+
+  const next = mkGs(prev.sp, prev.spu, prev.challengesDone);
+  next.pcnt = prev.pcnt;
+  next.gtime = prev.gtime;
+  next.lastPrestigeGtime = prev.gtime;
+  next.maxResonanceMul = prev.maxResonanceMul;
+  next.activeChallenge = i;
+  next.challengesDone = [...prev.challengesDone] as [boolean, boolean, boolean];
+  next.autoUnlock = prev.autoUnlock;
+  next.conLayers = prev.conLayers.map((cl, j) => ({
+    ...mkConLayer(j),
+    unlocked: cl.unlocked,
+  }));
+  next.cc = prev.conLayers[0].unlocked ? 1 : 0;
+  return next;
+}
+
 export function upgrade(prev: GameState, i: number): GameState {
   const layer = prev.layers[i];
   const resMul = Math.max(1, prev.resonanceMul);
   const effectiveCost = layer.cost / resMul;
   if (!layer.unlocked || prev.res < effectiveCost) return prev;
+
+  // C3: each layer max 1 upgrade
+  if (prev.activeChallenge === 2 && layer.upgrades >= 1) return prev;
 
   const layers = prev.layers.map(l => ({ ...l }));
   const l = layers[i];
@@ -96,8 +130,9 @@ export function upgrade(prev: GameState, i: number): GameState {
   l.upgrades += 1;
 
   let gmBonus = prev.gmBonus;
-  if (l.upgrades >= tierThreshold(l.pct + 1)) {
-    gmBonus += l.gainBonus; // Tier上昇: 蓄積したBonus → gMult加算
+  // C1: no tier-up
+  if (prev.activeChallenge !== 0 && l.upgrades >= tierThreshold(l.pct + 1)) {
+    gmBonus += l.gainBonus;
     l.int = l.bi;
     l.elapsed = 0;
     l.pct += 1;
@@ -133,8 +168,17 @@ export function unlockConLayer(prev: GameState, i: number): GameState {
 }
 
 export function buyCompress(prev: GameState): GameState {
+  // C2: compress disabled
+  if (prev.activeChallenge === 1) return prev;
+
   const resMul = Math.max(1, prev.resonanceMul);
-  const effectiveCost = prev.compressCost / resMul;
+  let effectiveCost = prev.compressCost / resMul;
+
+  // C3: cost divided by log(current SC)
+  if (prev.activeChallenge === 2) {
+    effectiveCost /= Math.log10(Math.max(prev.res, 10));
+  }
+
   if (prev.res < effectiveCost) return prev;
   return {
     ...prev,

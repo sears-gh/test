@@ -4,7 +4,7 @@ import { mkGs, defaultSpu } from "./game/init";
 import { loadSave, useSave } from "./hooks/useSave";
 import { useGameLoop } from "./hooks/useGameLoop";
 import { useWindowWidth } from "./hooks/useWindowWidth";
-import { upgrade, unlock, buySP, resonance, unlockConLayer, manualPrestige, buyCompress, bulkUpgrade, bulkCompress, toggleAutoUnlock } from "./game/actions";
+import { upgrade, unlock, buySP, resonance, unlockConLayer, manualPrestige, buyCompress, bulkUpgrade, bulkCompress, toggleAutoUnlock, enterChallenge } from "./game/actions";
 import { Header } from "./components/Header";
 import { LayerCard } from "./components/LayerCard";
 import { SpShop } from "./components/SpShop";
@@ -14,6 +14,7 @@ import { ResonanceModal } from "./components/ResonanceModal";
 import { ConstellationPanel } from "./components/ConstellationPanel";
 import { CompressCard } from "./components/CompressCard";
 import { StatisticsPanel } from "./components/StatisticsPanel";
+import { ChallengePanel } from "./components/ChallengePanel";
 import { NUM_LAYERS } from "./game/config";
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
   const [showResonance, setShowResonance] = useState(false);
   const [showConstellation, setShowConstellation] = useState(false);
   const [showStats, setShowStats] = useState(false);
+  const [showChallenge, setShowChallenge] = useState(false);
 
   useGameLoop(setGs);
   const { deleteSave } = useSave(gs, setGs);
@@ -41,6 +43,7 @@ function App() {
     onOpenConstellation: () => setShowConstellation(true),
     onOpenStats: () => setShowStats(true),
     onManualPrestige: () => setGs(prev => manualPrestige(prev)),
+    onOpenChallenge: () => setShowChallenge(true),
   };
 
   const layerCols = isWide ? "repeat(2, 1fr)" : "1fr";
@@ -107,6 +110,13 @@ function App() {
           gs={gs}
           onUnlock={i => setGs(prev => unlockConLayer(prev, i))}
           onClose={() => setShowConstellation(false)}
+        />
+      )}
+      {showChallenge && (
+        <ChallengePanel
+          gs={gs}
+          onEnter={i => { setGs(prev => enterChallenge(prev, i)); setShowChallenge(false); }}
+          onClose={() => setShowChallenge(false)}
         />
       )}
       <PrestigeFlash pcnt={gs.pcnt} />

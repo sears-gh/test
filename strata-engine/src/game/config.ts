@@ -5,9 +5,22 @@ export function tierThreshold(tier: number): number {
   return 5 * tier * (tier + 1);
 }
 
-// tierStep: base per-tier addend to the bonusVal exponent (0.200 + step×pct)
 export function getTierStep(deep: number): number {
   return deep > 0 ? 0.010 : 0.005;
+}
+
+export function getResExpDenom(
+  spu: { resExp: number },
+  activeChallenge: number | null,
+  challengesDone: [boolean, boolean, boolean]
+): number {
+  if (activeChallenge === 1) return 14 - spu.resExp;
+  if (challengesDone[1])     return 15 - spu.resExp;
+  return 16 - spu.resExp;
+}
+
+export function getCompressBase(challengesDone: [boolean, boolean, boolean]): number {
+  return challengesDone[2] ? 0.93 : 0.95;
 }
 
 export interface LayerCfg {

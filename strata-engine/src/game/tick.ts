@@ -1,4 +1,4 @@
-import { GP_THRESHOLD, getTierStep, LCFG } from "./config";
+import { GP_THRESHOLD, getTierStep, LCFG, getCompressBase } from "./config";
 import type { GameState, LayerState, ConstellationLayer } from "./types";
 import { doPrestige } from "./actions";
 
@@ -23,8 +23,10 @@ export function tick(prev: GameState, dt: number): GameState {
   const ceMul = ce > 0 ? Math.pow(1 + ce, ceExp) : 1;
   const tierStep = getTierStep(prev.spu.deep);
   const secStrength = prev.spu.halfTrigger > 0 ? 0.1 : 0;
-  const resonatorExp = Math.pow(1.02, prev.resonators);
-  const compressMul  = Math.pow(0.95, prev.compressLevel * resonatorExp);
+  const resonatorExp  = Math.pow(1.02, prev.resonators);
+  const compressBase  = getCompressBase(prev.challengesDone);
+  const compressEffMul = prev.activeChallenge === 0 ? 2 : 1;
+  const compressMul   = Math.pow(compressBase, prev.compressLevel * resonatorExp * compressEffMul);
 
   for (let i = 0; i < layersMut.length; i++) {
     const layer = layersMut[i];

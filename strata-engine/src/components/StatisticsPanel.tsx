@@ -1,6 +1,6 @@
 import React from "react";
 import type { GameState } from "../game/types";
-import { LCFG, CON_LCFG, getTierStep } from "../game/config";
+import { LCFG, CON_LCFG, getTierStep, getResExpDenom, getCompressBase } from "../game/config";
 import { fmtN, fmtT } from "../utils/format";
 
 interface Props {
@@ -39,8 +39,10 @@ export function StatisticsPanel({ gs, onClose }: Props) {
   const gmExp        = 1 + gs.resonanceMul * 0.01;
   const effectiveGm  = Math.pow(gm, gmExp);
   const resMul       = Math.max(1, gs.resonanceMul);
-  const resonatorExp = Math.pow(1.02, gs.resonators);
-  const compressMul  = Math.pow(0.95, gs.compressLevel * resonatorExp);
+  const resonatorExp   = Math.pow(1.02, gs.resonators);
+  const compressBase   = getCompressBase(gs.challengesDone);
+  const compressEffMul = gs.activeChallenge === 0 ? 2 : 1;
+  const compressMul    = Math.pow(compressBase, gs.compressLevel * resonatorExp * compressEffMul);
 
   const layerStats: LayerStat[] = gs.layers.map((l, i) => {
     const fireRate      = l.unlocked ? (0.5 / (l.int * compressMul)) : 0;
@@ -77,7 +79,7 @@ export function StatisticsPanel({ gs, onClose }: Props) {
   const ccPerSec  = nebula?.unlocked ? (0.1 / nebula.int) * nebula.efficiency : 0;
   const cePerSec  = gs.cc;
 
-  const resExpDenom = 16 - gs.spu.resExp;
+  const resExpDenom = getResExpDenom(gs.spu, gs.activeChallenge, gs.challengesDone);
 
   return (
     <div style={s.overlay} onClick={onClose}>
@@ -383,9 +385,16 @@ export function StatisticsPanel({ gs, onClose }: Props) {
         {/* ── Compress ── */}
         <Section label="Compress (SC購入)">
           <Row label="レベル" val={`Lv.${gs.compressLevel}`} />
+          <Row label="基礎倍率/Lv" val={`${compressBase}${gs.challengesDone[2] ? " (C3報酬)" : ""}`} />
           <Row label="共振子指数" val={`1.02^${gs.resonators} = ${resonatorExp.toFixed(4)}`} />
-          <Row label="インターバル倍率" val={`0.95^(Lv×${resonatorExp.toFixed(4)}) = ×${compressMul.toFixed(6)}`} accent />
-          <Row label="次のコスト" val={`${fmtN(gs.compressCost / resMul)} SC${resMul > 1 ? ` (÷${resMul.toFixed(2)})` : ""}`} />
+          {compressEffMul > 1 && (
+            <Row label="C1 効果倍率" val={`×${compressEffMul} (チャレンジ中)`} accent />
+          )}
+          <Row label="インターバル倍率" val={`${compressBase}^(Lv×${resonatorExp.toFixed(4)}${compressEffMul > 1 ? `×${compressEffMul}` : ""}) = ×${compressMul.toFixed(6)}`} accent />
+          {gs.activeChallenge === 1
+            ? <Row label="次のコスト" val="C2中: 購入不可" />
+            : <Row label="次のコスト" val={`${fmtN(gs.compressCost / resMul / (gs.activeChallenge === 2 ? Math.log10(Math.max(gs.res, 10)) : 1))} SC`} />
+          }
         </Section>
 
         {/* ── プレスティージ ── */}
